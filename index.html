@@ -1,0 +1,2332 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="工地現場">
+<meta name="theme-color" content="#111827">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" id="touchIcon" href="">
+<title>工地現場管理</title>
+<style>
+:root{--y:#ffc400;--yd:#e0a800;--bg:#eef0f3;--ink:#111827;--mut:#6b7280;--line:#e2e5ea;--card:#fff;--red:#dc2626;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
+:root[data-theme="dark"]{--bg:#0b0f14;--ink:#e8ebf0;--mut:#8b96a5;--line:#232b35;--card:#151c25}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;-webkit-text-size-adjust:100%;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+input,textarea,select{-webkit-user-select:text;user-select:text;color:var(--ink);background:var(--card)}
+button{font-family:inherit;color:inherit}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+header.top{flex:none;background:#111827;color:#fff;padding:calc(var(--sat) + 10px) 14px 10px;border-bottom:4px solid var(--y)}
+.hrow{display:flex;align-items:center;gap:10px}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--y);color:#111827;font-weight:900;font-size:24px;display:flex;align-items:center;justify-content:center;flex:none}
+.projSelBtn{flex:1;min-width:0;height:44px;border-radius:10px;border:0;background:#1f2937;color:#fff;font-size:15px;font-weight:700;padding:0 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;overflow:hidden}
+.projSelBtn .ptxt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.projSelBtn .pill{flex:none}
+.pickbtn{width:100%;background:var(--card);border:2px solid var(--line);border-radius:12px;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:16px;font-weight:700;color:var(--ink)}
+.pickbtn .pill{flex:none;margin-left:8px}
+.themeBtn{width:44px;height:44px;border-radius:10px;background:#1f2937;border:0;color:#fff;font-size:20px;flex:none}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 12px 28px}
+nav.tabs{flex:none;display:grid;grid-template-columns:1fr 1fr 84px 1fr 1fr;background:var(--card);border-top:1px solid var(--line);padding-bottom:var(--sab);height:calc(64px + var(--sab));position:relative}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:700;color:var(--mut)}
+.tab .ic{font-size:22px;line-height:1}
+.tab.on{color:var(--ink);box-shadow:inset 0 3px 0 var(--y)}
+.fabwrap{display:flex;justify-content:center}
+.fab{width:68px;height:68px;border-radius:50%;border:4px solid var(--card);background:var(--y);font-size:30px;margin-top:-22px;box-shadow:0 4px 14px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+.fab:active{background:var(--yd)}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pcard h2{margin:0 0 4px;font-size:19px}
+.mut{color:var(--mut);font-size:14px}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:13px;font-weight:800;color:#fff;background:#16a34a}
+.pill.off{background:#6b7280}
+.stats{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.stat{flex:1 1 0;min-width:0;background:rgba(127,127,127,.12);border-radius:10px;padding:8px 6px;text-align:center;overflow:hidden}
+.stat b{display:block;font-size:clamp(13px,4.2vw,20px);line-height:1.2;word-break:break-word;overflow-wrap:break-word;white-space:normal}
+.stat span{font-size:11.5px;color:var(--mut);display:block;margin-top:2px}
+.stat.red b{color:var(--red)}
+.search input{width:100%;height:50px;border-radius:12px;border:2px solid var(--line);background:var(--card);padding:0 14px;font-size:16px;margin-bottom:10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;-webkit-overflow-scrolling:touch}
+.chip{flex:none;height:44px;padding:0 16px;border-radius:99px;border:2px solid var(--line);background:var(--card);font-size:15px;font-weight:700;color:var(--ink)}
+.chip.on{background:#111827;color:#fff;border-color:#111827}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
+.rec{display:flex;gap:12px;background:var(--card);border-radius:14px;padding:10px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.rec:active{opacity:.8}
+.rec img{width:92px;height:92px;object-fit:cover;border-radius:10px;background:#ddd;flex:none}
+.rb{flex:1;min-width:0}
+.rt{font-weight:800;font-size:16px;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rm{font-size:13px;color:var(--mut);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:inline-block;padding:2px 9px;border-radius:6px;font-size:13px;font-weight:800;color:#fff}
+.btn{min-height:52px;border-radius:12px;border:2px solid var(--ink);background:var(--card);color:var(--ink);font-size:16px;font-weight:800;padding:0 16px;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;cursor:pointer}
+.btn.y{background:var(--y);border-color:var(--y);color:#111827}
+.btn.dark{background:#111827;color:#fff;border-color:#111827}
+.btn.red{background:var(--card);border-color:var(--red);color:var(--red)}
+.btn.sm{min-height:40px;font-size:14px;padding:0 12px}
+.btn:active{opacity:.75}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.gap{height:10px}
+.empty{text-align:center;color:var(--mut);padding:36px 10px;font-size:15px}
+.empty .big{font-size:44px}
+label.f{display:block;font-weight:800;font-size:14px;margin:12px 0 6px}
+.in{width:100%;min-height:50px;border-radius:12px;border:2px solid var(--line);padding:10px 12px;font-size:16px;background:var(--card);font-family:inherit;color:var(--ink)}
+textarea.in{min-height:90px;resize:vertical}
+select.in{height:50px;padding:0 10px}
+#modal{position:fixed;inset:0;z-index:50;display:none}
+#modal.show{display:block}
+.ov{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end}
+.sheet{width:100%;max-height:calc(94dvh - var(--sat));max-height:calc(94vh - var(--sat));overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);border-radius:20px 20px 0 0;padding:calc(14px + var(--sat)) 14px calc(18px + var(--sab))}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:18px}
+.x{width:44px;height:44px;border-radius:50%;border:0;background:rgba(127,127,127,.2);color:var(--ink);font-size:18px}
+.cfOv{position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:24px}
+.cfBox{width:100%;max-width:320px;background:var(--card);border-radius:16px;padding:20px 18px 18px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.cfMsg{font-size:15px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:18px;line-height:1.5}
+.prevbox{height:190px;border-radius:14px;background:rgba(127,127,127,.2);display:flex;align-items:center;justify-content:center;color:var(--mut);margin:8px 0 10px;overflow:hidden;position:relative}
+.prevbox img,.full{width:100%;height:100%;object-fit:contain;background:#000}
+.full{height:auto;max-height:60vh;border-radius:12px;margin:8px 0}
+.kv{font-size:15px;margin:6px 0;line-height:1.5}
+.kv b{color:var(--mut);font-weight:700;margin-right:6px}
+.proj.cur{border:3px solid var(--y)}
+.proj h3{margin:0 0 4px;font-size:18px}
+#toast{position:fixed;left:50%;bottom:calc(84px + var(--sab));transform:translateX(-50%);background:#111827;color:#fff;padding:12px 18px;border-radius:12px;font-weight:700;z-index:90;display:none;max-width:88%;text-align:center}
+#busy{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-weight:800;gap:14px}
+.spin{width:44px;height:44px;border:5px solid #fff5;border-top-color:var(--y);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.cmpgrid{display:grid;gap:10px}
+.cmpgrid.side{grid-template-columns:1fr 1fr}
+.cmpbox{background:var(--card);border-radius:12px;padding:6px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.cmpbox img{width:100%;display:block;border-radius:8px;background:#000;min-height:90px}
+.cmpbox select{width:100%;height:44px;font-size:14px;border-radius:8px;border:2px solid var(--line);margin-bottom:6px}
+.cmpcap{font-size:13px;margin-top:4px;color:var(--mut)}
+/* 更多選單 grid */
+.mgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.mitem{background:var(--card);border-radius:14px;padding:14px 6px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.12);border:0}
+.mitem .ic{font-size:28px;display:block;margin-bottom:6px}
+.mitem .lb{font-size:13px;font-weight:700}
+.switchrow{display:flex;align-items:center;justify-content:space-between;padding:4px 2px}
+.sw{width:52px;height:30px;border-radius:99px;background:#9ca3af;position:relative;border:0;flex:none}
+.sw.on{background:var(--y)}
+.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.15s}
+.sw.on i{left:25px}
+/* 工程人員組織架構圖（橫向網狀樹） */
+.orgZoomRow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.orgZoomRow button{width:38px;height:38px;border-radius:9px;border:0;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12);font-size:18px;font-weight:800}
+.orgZoomRow .zlabel{font-size:13px;font-weight:700;color:var(--mut);min-width:44px;text-align:center}
+.orgWrap{overflow:auto;-webkit-overflow-scrolling:touch;padding:6px 4px 16px;touch-action:pan-x pan-y}
+.tree{display:inline-block;min-width:100%;text-align:center;transform-origin:top left;white-space:nowrap}
+.tree ul{padding-top:18px;position:relative;display:inline-table;margin:0 auto;white-space:nowrap}
+.tree li{display:inline-block;text-align:center;list-style:none;position:relative;padding:18px 10px 0 10px;vertical-align:top;white-space:normal}
+.tree li::before,.tree li::after{content:'';position:absolute;top:0;right:50%;border-top:2px solid var(--line);width:50%;height:18px}
+.tree li::after{right:auto;left:50%;border-left:2px solid var(--line)}
+.tree li:only-child::after,.tree li:only-child::before{display:none}
+.tree li:only-child{padding-top:0}
+.tree li:first-child::before,.tree li:last-child::after{border:0 none}
+.tree li:last-child::before{border-right:2px solid var(--line);border-radius:0 6px 0 0}
+.tree li:first-child::after{border-radius:6px 0 0 0}
+.tree>ul{padding-top:0}
+.tree>ul>li::before,.tree>ul>li::after{display:none}
+.tree ul ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid var(--line);width:0;height:18px}
+.orgCard{display:inline-flex;flex-direction:column;align-items:stretch;gap:2px;background:var(--card);border-radius:12px;padding:8px 10px;box-shadow:0 1px 3px rgba(0,0,0,.12);border-top:4px solid var(--y);width:168px;white-space:normal;vertical-align:top;transition:opacity .2s}
+.orgCard.lv0{border-top-color:#dc2626}
+.orgCard.lv1{border-top-color:#2563eb}
+.orgCard.lv2{border-top-color:#16a34a}
+.orgCard.lv3{border-top-color:#9333ea}
+.orgCard .ic{font-size:20px}
+.orgCard .nm{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orgCard .mt{font-size:11.5px;color:var(--mut);word-break:break-word}
+.orgCard .mt.phone{color:var(--ink);font-weight:700}
+.orgCard .rolePill{display:inline-block;font-size:10px;font-weight:800;color:#fff;border-radius:99px;padding:1px 8px;margin:2px auto 0}
+.orgCard .op{display:flex;gap:4px;margin-top:4px;justify-content:center}
+.orgCard .op button{border:0;background:rgba(127,127,127,.15);border-radius:7px;width:26px;height:26px;font-size:12px}
+.orgEmpty{text-align:center;color:var(--mut);padding:30px 10px;font-size:14px}
+/* 月曆 */
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calhead b{font-size:18px}
+.calnavb{width:40px;height:40px;border-radius:10px;border:0;background:var(--card);font-size:18px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.calgrid .wd{font-size:12px;color:var(--mut);font-weight:700;padding:4px 0}
+.calday{aspect-ratio:1;border-radius:10px;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;font-weight:700;position:relative;border:2px solid transparent}
+.calday.other{opacity:.28}
+.calday.today{border-color:var(--y)}
+.calday .dots{display:flex;gap:2px;margin-top:3px}
+.calday .dots i{width:5px;height:5px;border-radius:50%;background:var(--y)}
+.dlist{display:flex;gap:10px;padding:10px;border-radius:12px;background:rgba(127,127,127,.1);margin-bottom:8px;align-items:flex-start}
+.dlist .ic2{font-size:20px;flex:none}
+/* 進度 */
+.pfloor{font-weight:800;margin:14px 0 6px;font-size:15px}
+.pitem{background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pitem .top{display:flex;justify-content:space-between;font-weight:700;margin-bottom:6px}
+.pbar{height:14px;border-radius:99px;background:rgba(127,127,127,.2);overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--y),#22c55e);border-radius:99px}
+.gwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.grow{display:flex;align-items:center;gap:8px;margin-bottom:8px;min-width:520px}
+.glabel{width:120px;flex:none;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gtrack{flex:1;height:22px;background:rgba(127,127,127,.15);border-radius:8px;position:relative}
+.gbar{position:absolute;top:2px;bottom:2px;border-radius:6px;background:var(--y);font-size:11px;color:#111827;display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden;white-space:nowrap}
+/* 報價表格 */
+.qtable{width:100%;border-collapse:collapse;font-size:14px}
+.qtable th,.qtable td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left}
+.qtable input{width:100%;height:38px;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:14px;background:var(--card);color:var(--ink)}
+.qtotal{text-align:right;font-size:20px;font-weight:900;margin:10px 0}
+.rmbtn{width:34px;height:34px;border-radius:8px;border:0;background:#fee2e2;color:var(--red);font-weight:900}
+/* 巡檢表 */
+.ckrow{display:flex;gap:8px;align-items:center;background:var(--card);border-radius:10px;padding:8px;margin-bottom:8px}
+.ckrow select{height:40px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.ckrow input[type=text]{flex:1;height:40px;border:1px solid var(--line);border-radius:8px;padding:0 8px;background:var(--card);color:var(--ink)}
+/* 圖紙標記 */
+.bpwrap{position:relative;border-radius:12px;overflow:hidden;background:#000}
+.bpwrap img{width:100%;display:block}
+.pin{position:absolute;width:26px;height:26px;margin:-26px 0 0 -13px;background:var(--red);color:#fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.pin span{transform:rotate(45deg)}
+.pinlist{margin-top:8px}
+.pinrow{display:flex;gap:8px;align-items:center;background:var(--card);border-radius:10px;padding:8px;margin-bottom:6px}
+.pinrow b{width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+.expwarn{background:#fee2e2;color:var(--red);font-weight:700;font-size:12px;padding:2px 8px;border-radius:6px;display:inline-block;margin-top:4px}
+#printRoot{display:none}
+#repPrev{transform-origin:top left}
+.pg{width:210mm;height:296mm;background:#fff;color:#000;margin:0 auto 12px;padding:10mm 10mm 7mm;display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(0,0,0,.25);overflow:hidden;-webkit-user-select:none}
+.pg-t{text-align:center;font-size:24px;font-weight:800;letter-spacing:6px;margin:0 0 8px}
+.pg-i{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:7px;table-layout:fixed}
+.pg-i th,.pg-i td{border:1px solid #222;padding:4px 6px;text-align:left}
+.pg-i th{background:#e9e9e9;width:74px;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pg-g{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:5mm;min-height:0}
+.cell{border:1px solid #222;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.ph{flex:1;min-height:0;position:relative;background:#f0f0f0}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.ct{width:100%;border-collapse:collapse;font-size:10.5px;table-layout:fixed}
+.ct th,.ct td{border-top:1px solid #222;border-left:1px solid #222;padding:2px 4px;text-align:left;vertical-align:top;line-height:1.35}
+.ct th{width:34px;background:#e9e9e9;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ct tr>*:first-child{border-left:0}
+.ct .clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.st{color:#fff;padding:0 5px;border-radius:3px;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pg-f{text-align:center;font-size:10px;color:#444;margin-top:4px}
+.pg-doc{width:210mm;min-height:296mm;background:#fff;color:#000;margin:0 auto 12px;padding:14mm;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.pg-doc h1{font-size:22px;text-align:center;letter-spacing:4px}
+.pg-doc table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.pg-doc th,.pg-doc td{border:1px solid #333;padding:5px 7px;text-align:left}
+.pg-doc th{background:#eee;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@media print{
+  @page{size:A4;margin:0}
+  html,body{height:auto!important;background:#fff;overflow:visible}
+  #app,#modal,#toast,#busy{display:none!important}
+  #printRoot{display:block!important}
+  .pg,.pg-doc{margin:0;box-shadow:none;page-break-after:always;break-after:page}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="hrow">
+      <div class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 15a8 8 0 0 1 16 0v0.5H4V15z" fill="#fff"/><rect x="2" y="15" width="20" height="2.6" rx="1.3" fill="#fff"/><rect x="10.5" y="6.5" width="3" height="3" rx="1" fill="#fff"/><path d="M6.5 17.6c-1 1.6-1 3.2-0.3 4.6" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M17.5 17.6c1 1.6 1 3.2 0.3 4.6" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M6.2 22.2q5.8 2.2 11.6 0" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg></div>
+      <button id="projSel" class="projSelBtn" onclick="openProjectPicker()"></button>
+      <button class="themeBtn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+  </header>
+  <main id="main"></main>
+  <nav class="tabs" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<div id="toast"></div>
+<div id="busy"><div class="spin"></div><div id="busyTxt">處理中…</div></div>
+<div id="printRoot"></div>
+
+<script>
+'use strict';
+/* ========== 常數與工具 ========== */
+const ST={
+  before:{n:'施工前',c:'#475569'},
+  doing:{n:'施工中',c:'#d97706'},
+  done:{n:'完工',c:'#15803d'},
+  defect:{n:'待改善',c:'#dc2626'},
+  fixed:{n:'已改善',c:'#0f766e'}
+};
+const STK=Object.keys(ST);
+const isBefore=s=>s==='before'||s==='defect';
+const isAfter=s=>s==='done'||s==='fixed';
+const wmTag=s=>s==='defect'?'缺失改善｜待改善':s==='fixed'?'缺失改善｜已改善':ST[s].n;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const p2=n=>String(n).padStart(2,'0');
+const fmt=t=>{const d=new Date(t);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())+' '+p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());};
+const fmtD=t=>fmt(t).slice(0,10);
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());};
+const lsGet=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const daysInMonth=(y,m)=>new Date(y,m+1,0).getDate();
+
+/* ========== IndexedDB ========== */
+const EXTRA_STORES=['materials','workers','inspections','meetings','memos','attendance','progressItems','blueprints','blueprintPhotos','finance','orgNodes','vendors','progCats'];
+let db;
+function openDB(){return new Promise((res,rej)=>{
+  const r=indexedDB.open('sitelog_db',6);
+  r.onupgradeneeded=()=>{
+    const d=r.result;
+    if(!d.objectStoreNames.contains('projects'))d.createObjectStore('projects',{keyPath:'id'});
+    if(!d.objectStoreNames.contains('records'))d.createObjectStore('records',{keyPath:'id'}).createIndex('projectId','projectId');
+    if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'});
+    EXTRA_STORES.forEach(n=>{
+      if(!d.objectStoreNames.contains(n)){
+        const s=d.createObjectStore(n,{keyPath:'id'});
+        if(n!=='blueprintPhotos')s.createIndex('projectId','projectId');
+      }
+    });
+  };
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);
+});}
+const req=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});
+const store=(n,m)=>db.transaction(n,m||'readonly').objectStore(n);
+const dbAll=n=>req(store(n).getAll());
+const dbGet=(n,k)=>req(store(n).get(k));
+const dbPut=(n,v)=>req(store(n,'readwrite').put(v));
+const dbDel=(n,k)=>req(store(n,'readwrite').delete(k));
+const dbByProj=n=>curId?req(store(n).index('projectId').getAll(curId)):Promise.resolve([]);
+const txDone=t=>new Promise((res,rej)=>{t.oncomplete=res;t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error);});
+function savePhotoRecord(rec,blob){const t=db.transaction(['records','photos'],'readwrite');t.objectStore('records').put(rec);t.objectStore('photos').put({id:rec.id,blob:blob});return txDone(t);}
+function delRecordDB(ids){const t=db.transaction(['records','photos'],'readwrite');ids.forEach(id=>{t.objectStore('records').delete(id);t.objectStore('photos').delete(id);});return txDone(t);}
+
+/* ========== 狀態 ========== */
+let projects=[],recs=[],curId=lsGet('cur');
+const counts={};
+const state={view:'records',q:'',f:'all',mod:''};
+const cmp={loc:'',l:'',r:'',layout:'side'};
+const rep={scope:'filtered',per:4,title:'工程相片紀錄表',by:lsGet('by')};
+const cal={y:new Date().getFullYear(),m:new Date().getMonth(),sel:''};
+const urlCache={};
+let pending={file:null,time:0,url:''};
+let formStatus='doing';
+let mdata={}; // 模組資料快取 {storeName:[...]}
+let workersCache=[];
+
+const curProject=()=>projects.find(p=>p.id===curId);
+async function loadProjects(){
+  projects=(await dbAll('projects')).sort((a,b)=>a.createdAt-b.createdAt);
+  if(!projects.find(p=>p.id===curId)) curId=projects.length?projects[projects.length-1].id:'';
+  lsSet('cur',curId);
+  await Promise.all(projects.map(async p=>{counts[p.id]=await req(store('records').index('projectId').count(p.id));}));
+}
+async function loadRecs(){
+  recs=curId?await req(store('records').index('projectId').getAll(curId)):[];
+  if(curId) counts[curId]=recs.length;
+}
+async function loadMod(name){mdata[name]=await dbByProj(name);return mdata[name];}
+async function getFull(id,ph){
+  ph=ph||'photos';
+  const key=ph+':'+id;
+  if(urlCache[key])return urlCache[key];
+  const p=await dbGet(ph,id);if(!p)return '';
+  return urlCache[key]=URL.createObjectURL(p.blob);
+}
+async function hydrate(){
+  const imgs=[...document.querySelectorAll('img[data-pid]')];
+  await Promise.all(imgs.map(async i=>{
+    if(i.dataset.done)return;
+    const u=await getFull(i.dataset.pid,i.dataset.store);i.src=u;i.dataset.done='1';
+    try{await i.decode();}catch(e){}
+  }));
+}
+
+/* ========== UI 基礎 ========== */
+let toastT;
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toastT);toastT=setTimeout(()=>t.style.display='none',2200);}
+function busy(on,txt){$('busy').style.display=on?'flex':'none';if(txt)$('busyTxt').textContent=txt;}
+function modal(html){$('modal').innerHTML='<div class="ov" onclick="if(event.target===this)closeModal()"><div class="sheet">'+html+'</div></div>';$('modal').classList.add('show');}
+function closeModal(){$('modal').classList.remove('show');$('modal').innerHTML='';if(pending.url){URL.revokeObjectURL(pending.url);pending.url='';}}
+function askConfirm(msg,okLabel){
+  return new Promise(resolve=>{
+    const wrap=document.createElement('div');
+    wrap.className='cfOv';
+    wrap.innerHTML='<div class="cfBox"><div class="cfMsg"></div><div class="two"><button class="btn" type="button">取消</button><button class="btn red" type="button"></button></div></div>';
+    wrap.querySelector('.cfMsg').textContent=msg;
+    const btns=wrap.querySelectorAll('button');
+    btns[0].textContent='取消';
+    btns[1].textContent=okLabel||'確定刪除';
+    document.body.appendChild(wrap);
+    const done=v=>{wrap.remove();resolve(v);};
+    btns[0].onclick=()=>done(false);
+    btns[1].onclick=()=>done(true);
+    wrap.addEventListener('click',e=>{if(e.target===wrap)done(false);});
+  });
+}
+function go(v){state.view=v;render();$('main').scrollTop=0;}
+function openMod(key){state.mod=key;go('mod');}
+async function switchProject(id){
+  curId=id;lsSet('cur',id);state.f='all';state.q='';cmp.loc='';
+  await loadRecs();render();
+}
+function toggleTheme(){
+  const cur=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=cur;lsSet('theme',cur);
+  $('themeBtn').textContent=cur==='dark'?'☀️':'🌙';
+}
+async function saveBlob(blob,name){
+  const f=new File([blob],name,{type:blob.type});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){
+    try{await navigator.share({files:[f],title:name});return;}catch(e){if(e.name==='AbortError')return;}
+  }
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},3000);
+}
+async function shareText(title,text){
+  if(navigator.share){try{await navigator.share({title:title,text:text});return;}catch(e){if(e.name==='AbortError')return;}}
+  try{await navigator.clipboard.writeText(text);toast('已複製到剪貼簿，可貼到 LINE 分享');}catch(e){alert(text);}
+}
+function toCSV(rows,headers){
+  const esc2=v=>{v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const lines=[headers.map(h=>esc2(h.label)).join(',')].concat(rows.map(r=>headers.map(h=>esc2(typeof h.get==='function'?h.get(r):r[h.key])).join(',')));
+  return new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+}
+
+function projectYearName(p){return new Date(p.createdAt||Date.now()).getFullYear()+' '+p.name;}
+function statusPill(status){return '<span class="pill" style="background:'+(status==='done'?'#6b7280':'#16a34a')+'">'+(status==='done'?'已完工':'進行中')+'</span>';}
+function renderHeader(){
+  const s=$('projSel');
+  if(!projects.length){s.innerHTML='<span class="ptxt">尚無案場，請先新增</span>';return;}
+  const p=curProject()||projects[0];
+  s.innerHTML='<span class="ptxt">'+esc(projectYearName(p))+'</span>'+statusPill(p.status);
+}
+function openProjectPicker(){
+  if(!projects.length){toast('尚無案場，請先新增');go('more');openProjectForm();return;}
+  modal('<div class="sheet-h"><b>選擇案場</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<button class="btn sm" style="margin-bottom:10px" onclick="openProjectsOverview()">📊 案場總覽</button>'+
+    projects.slice().reverse().map(p=>'<button class="pickbtn" style="margin-bottom:8px;'+(p.id===curId?'box-shadow:0 0 0 2px var(--y)':'')+'" onclick="closeModal();switchProject(\''+p.id+'\')"><span class="ptxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(projectYearName(p))+'</span>'+statusPill(p.status)+'</button>').join(''));
+}
+async function projectFinSummary(p){
+  const contract=parseFloat(p.finalContract)||0;
+  const dedList=(p.deductions&&p.deductions.length)?p.deductions:DEFAULT_DEDUCTIONS;
+  const dedSum=dedList.reduce((s,d)=>s+contract*(parseFloat(d.pct)||0)/100,0);
+  const net=contract-dedSum;
+  const mats=await req(store('materials').index('projectId').getAll(p.id));
+  const matCost=mats.reduce((s,it)=>s+materialAmount(it),0);
+  const profit=net-matCost;
+  const profitPct=contract?profit/contract*100:0;
+  return {contract:contract,profit:profit,profitPct:profitPct};
+}
+async function openProjectsOverview(){
+  busy(true,'載入總覽…');
+  let body='';
+  try{
+    const list=projects.slice().reverse();
+    const cards=[];
+    for(const p of list){
+      const f=await projectFinSummary(p);
+      cards.push('<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><b style="font-size:15px">'+esc(p.name)+'</b>'+statusPill(p.status)+'</div>'+
+        '<div class="mut" style="margin:2px 0 6px">📍 '+esc(p.location||'—')+'</div>'+
+        '<div class="kv"><b>承攬金額</b>'+money(f.contract)+'</div>'+
+        '<div class="kv"><b>最終利潤</b><span style="color:'+(f.profit>=0?'#16a34a':'#dc2626')+';font-weight:700">'+money(f.profit)+'</span></div>'+
+        '<div class="kv"><b>利潤率</b><span style="font-weight:700">'+pct1(f.profitPct)+'%</span></div></div>');
+    }
+    body=cards.join('')||'<div class="empty">尚無案場</div>';
+  }finally{busy(false);}
+  modal('<div class="sheet-h"><b>📊 案場總覽</b><button class="x" onclick="closeModal()">✕</button></div>'+body);
+}
+function renderTabs(){
+  const t=(v,ic,lb)=>'<button class="tab '+(state.view===v?'on':'')+'" onclick="go(\''+v+'\')"><span class="ic">'+ic+'</span>'+lb+'</button>';
+  $('tabs').innerHTML=t('records','🏠','首頁')+t('calendar','📅','月曆')+
+    '<div class="fabwrap"><button class="fab" onclick="openQuickAdd()" aria-label="快速新增">＋</button></div>'+
+    t('progress','📈','進度')+t('more','☰','更多');
+}
+function render(){
+  renderHeader();renderTabs();
+  const m=$('main'),v=state.view;
+  if(!curProject()&&v!=='more'&&v!=='projects'){
+    m.innerHTML='<div class="empty"><div class="big">🏗</div><p>還沒有任何案場<br>請先新增第一個工程案場</p></div><button class="btn y" onclick="openProjectForm()">＋ 新增案場</button>';
+    return;
+  }
+  if(v==='records'){m.innerHTML='<div class="empty">載入中…</div>';renderRecordsPage();}
+  else if(v==='calendar'){m.innerHTML='<div class="empty">載入中…</div>';renderCalendar();}
+  else if(v==='progress'){m.innerHTML='<div class="empty">載入中…</div>';renderProgress();}
+  else if(v==='compare'){m.innerHTML=viewCompare();hydrate();}
+  else if(v==='report'){m.innerHTML=viewReport();buildReport();}
+  else if(v==='projects'){m.innerHTML=viewProjects();}
+  else if(v==='more'){m.innerHTML=viewMore();}
+  else if(v==='mod'){m.innerHTML='<div class="empty">載入中…</div>';renderModView();}
+  else if(v==='orgchart'){m.innerHTML='<div class="empty">載入中…</div>';renderOrgChartPage();}
+  else if(v==='vendorRank'){m.innerHTML='<div class="empty">載入中…</div>';renderVendorRankPage();}
+}
+async function renderOrgChartPage(){
+  $('main').innerHTML=await orgChartView();
+  orgBindZoomGesture();
+}
+
+/* ========== 快速新增 FAB ========== */
+function openQuickAdd(){
+  if(!curProject()){openProjectForm();return;}
+  const items=[
+    ['🏗','新增案場',()=>openProjectForm()],
+    ['📷','現場拍照',()=>openRecordForm()],
+    ['📝','備忘錄',()=>openGenericForm('memos')],
+    ['📦','材料／發包／零用金',()=>openMaterialForm()],
+    ['👷','施工人員',()=>openGenericForm('workers')],
+    ['✅','工地巡檢',()=>openInspectionForm()],
+    ['🗒','會議記錄',()=>openGenericForm('meetings')],
+    ['📐','圖紙標記',()=>openBlueprintForm()]
+  ];
+  window.__qa=items;
+  modal('<div class="sheet-h"><b>快速新增</b><button class="x" onclick="closeModal()">✕</button></div><div class="mgrid">'+
+    items.map((it,i)=>'<button class="mitem" onclick="closeModal();setTimeout(()=>window.__qa['+i+'][2](),120)"><span class="ic">'+it[0]+'</span><span class="lb">'+it[1]+'</span></button>').join('')+'</div>');
+}
+
+/* ========== 首頁（案場資訊＋財務總覽＋紀錄列表） ========== */
+async function renderRecordsPage(){
+  await loadMod('materials');
+  const m=$('main');if(state.view!=='records')return;
+  m.innerHTML=viewRecords();
+  renderChips();renderList();
+}
+function viewRecords(){
+  const p=curProject();
+  const defect=recs.filter(r=>r.status==='defect').length;
+  return '<div class="card pcard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><h2>'+esc(p.name)+'</h2><span class="pill" style="background:'+(p.status==='done'?'#6b7280':'#16a34a')+'">'+(p.status==='done'?'已完工':'進行中')+'</span></div>'+
+    '<div class="mut">業主／主包：'+esc(p.client||'—')+'</div><div class="mut">施作位置：'+esc(p.location||'—')+'</div>'+
+    '<div class="stats"><div class="stat"><b>'+recs.length+'</b><span>總紀錄</span></div><div class="stat red"><b>'+defect+'</b><span>待改善</span></div><div class="stat"><b>'+recs.filter(r=>r.status==='fixed').length+'</b><span>已改善</span></div></div></div>'+
+    financeSummaryHTML()+
+    '<div class="search"><input id="q" type="search" placeholder="🔍 搜尋標題、說明、位置" value="'+esc(state.q)+'" oninput="state.q=this.value;renderChips();renderList()"></div>'+
+    '<div class="chips" id="chips"></div><div id="recList"></div>';
+}
+function filtered(){
+  const q=state.q.trim().toLowerCase();
+  return recs.filter(r=>(state.f==='all'||r.status===state.f)&&(!q||[r.title,r.desc,r.location,ST[r.status].n].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.createdAt-a.createdAt);
+}
+function setF(k){state.f=k;renderChips();renderList();}
+function renderChips(){
+  const el=$('chips');if(!el)return;
+  el.innerHTML=['all'].concat(STK).map(k=>{
+    const n=k==='all'?recs.length:recs.filter(r=>r.status===k).length;
+    return '<button class="chip '+(state.f===k?'on':'')+'" onclick="setF(\''+k+'\')">'+(k==='all'?'全部':ST[k].n)+' '+n+'</button>';
+  }).join('');
+}
+function renderList(){
+  const el=$('recList');if(!el)return;
+  const l=filtered();
+  if(!l.length){el.innerHTML='<div class="empty"><div class="big">📷</div><p>'+(recs.length?'沒有符合條件的紀錄':'尚無紀錄<br>點下方黃色 ＋ 按鈕開始現場拍照')+'</p></div>';return;}
+  el.innerHTML=l.map(r=>'<div class="rec" onclick="openDetail(\''+r.id+'\')"><img src="'+r.thumb+'" alt=""><div class="rb"><div class="rt">'+esc(r.title)+'</div><span class="badge" style="background:'+ST[r.status].c+'">'+ST[r.status].n+'</span><div class="rm">📍 '+esc(r.location||'未填位置')+'</div><div class="rm">🕒 '+fmt(r.createdAt)+'</div></div></div>').join('');
+}
+
+/* ========== 詳細 ========== */
+async function openDetail(id){
+  const r=recs.find(x=>x.id===id);if(!r)return;
+  modal('<div class="sheet-h"><b>紀錄詳情</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<img id="dImg" class="full" src="'+r.thumb+'" alt="">'+
+    '<div class="kv"><span class="badge" style="background:'+ST[r.status].c+'">'+ST[r.status].n+'</span></div>'+
+    '<div class="kv"><b>標題</b>'+esc(r.title)+'</div><div class="kv"><b>位置</b>'+esc(r.location||'—')+'</div>'+
+    '<div class="kv"><b>時間</b>'+fmt(r.createdAt)+'</div><div class="kv"><b>說明</b>'+(esc(r.desc)||'—').replace(/\n/g,'<br>')+'</div><div class="gap"></div>'+
+    '<div class="two"><button class="btn" onclick="openRecordForm(\''+id+'\')">✏️ 編輯</button><button class="btn" onclick="compareFrom(\''+id+'\')">🔀 同位置對比</button></div><div class="gap"></div>'+
+    '<div class="two"><button class="btn" onclick="savePhoto(\''+id+'\')">💾 儲存／分享照片</button><button class="btn red" onclick="delRecord(\''+id+'\')">🗑 刪除</button></div>');
+  getFull(id).then(u=>{const i=$('dImg');if(i&&u)i.src=u;});
+}
+async function savePhoto(id){
+  const p=await dbGet('photos',id);if(!p)return;
+  const r=recs.find(x=>x.id===id);
+  await saveBlob(p.blob,'site_'+fmt(r.createdAt).replace(/[: ]/g,'').replace(/-/g,'')+'.jpg');
+}
+async function delRecord(id){
+  if(!(await askConfirm('確定刪除此紀錄與照片？無法復原。')))return;
+  await delRecordDB([id]);
+  const key='photos:'+id;if(urlCache[key]){URL.revokeObjectURL(urlCache[key]);delete urlCache[key];}
+  closeModal();await loadRecs();render();toast('已刪除');
+}
+
+/* ========== 新增／編輯紀錄（含照片文字標記） ========== */
+let stickers=[]; // {x,y,text} 百分比座標
+function openRecordForm(id){
+  const p=curProject();
+  if(!p){toast('請先新增案場');go('more');return;}
+  const r=id?recs.find(x=>x.id===id):null;
+  pending={file:null,time:0,url:''};stickers=[];
+  formStatus=r?r.status:(lsGet('lastSt:'+p.id)||'doing');
+  const locs=[...new Set([p.location].concat(recs.map(x=>x.location)).filter(Boolean))];
+  const defLoc=r?r.location:(lsGet('lastLoc:'+p.id)||p.location||'');
+  modal('<div class="sheet-h"><b>'+(r?'編輯紀錄':'📷 現場拍照')+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    (r?'<div class="mut" style="font-size:13px">浮水印已燒錄在照片內，編輯文字不會改動照片。若狀態改變請另外拍新照片。</div><div class="prevbox"><img src="'+r.thumb+'"></div>'
+      :'<div class="prevbox" id="prevBox">尚未選擇照片</div>'+
+       '<div class="two"><label class="btn y">📷 拍照<input type="file" accept="image/*" capture="environment" hidden id="fCam" onchange="pick(this)"></label>'+
+       '<label class="btn">🖼 相簿<input type="file" accept="image/*" hidden id="fAlb" onchange="pick(this)"></label></div>'+
+       '<div class="mut" style="font-size:12px;margin-top:6px" id="stkHint">選好照片後，可點下方「加文字標記」在照片上加註文字（會一併燒錄）</div>'+
+       '<button class="btn sm" style="margin-top:6px" onclick="addSticker()">🔤 加文字標記</button><div id="stkList"></div>')+
+    '<label class="f">狀態</label><div class="chips wrap" id="fSt"></div>'+
+    '<label class="f">工項／缺失標題 *</label><input class="in" id="fTitle" placeholder="例如：3F 天花板輕鋼架" value="'+esc(r?r.title:'')+'">'+
+    '<label class="f">施作位置／樓層</label><input class="in" id="fLoc" list="locList" placeholder="例如：3F 東側走廊" value="'+esc(defLoc)+'"><datalist id="locList">'+locs.map(l=>'<option value="'+esc(l)+'">').join('')+'</datalist>'+
+    '<label class="f">詳細說明</label><textarea class="in" id="fDesc" placeholder="施工內容、缺失描述、改善方式…">'+esc(r?r.desc:'')+'</textarea><div class="gap"></div>'+
+    '<button class="btn dark" onclick="saveRecord('+(r?'\''+r.id+'\'':'null')+')">💾 儲存紀錄</button>');
+  renderFormSt();
+  if(!r) setTimeout(()=>{const c=$('fCam');if(c)c.click();},50);
+}
+function renderFormSt(){
+  const el=$('fSt');if(!el)return;
+  el.innerHTML=STK.map(k=>'<button class="chip '+(formStatus===k?'on':'')+'" style="'+(formStatus===k?'background:'+ST[k].c+';border-color:'+ST[k].c:'')+'" onclick="formStatus=\''+k+'\';renderFormSt()">'+ST[k].n+'</button>').join('');
+}
+function pick(inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  pending.file=f;pending.time=Date.now();stickers=[];
+  if(pending.url)URL.revokeObjectURL(pending.url);
+  pending.url=URL.createObjectURL(f);
+  $('prevBox').innerHTML='<img src="'+pending.url+'">';
+  renderStickers();
+  const t=$('fTitle');if(t&&!t.value)t.focus();
+}
+function renderStickers(){
+  const el=$('stkList');if(!el)return;
+  el.innerHTML=stickers.map((s,i)=>'<div class="pinrow"><b>'+(i+1)+'</b><div style="flex:1">'+esc(s.text)+'</div><button class="rmbtn" onclick="stickers.splice('+i+',1);renderStickers()">✕</button></div>').join('');
+}
+function addSticker(){
+  if(!pending.file){toast('請先選擇照片');return;}
+  const t=prompt('輸入要加在照片上的文字標記：');
+  if(t&&t.trim())stickers.push({text:t.trim()});
+  renderStickers();
+}
+async function saveRecord(id){
+  const title=$('fTitle').value.trim(),loc=$('fLoc').value.trim(),desc=$('fDesc').value.trim(),status=formStatus;
+  if(!title){toast('請輸入工項／缺失標題');$('fTitle').focus();return;}
+  const p=curProject();
+  if(id){
+    const r=recs.find(x=>x.id===id);
+    Object.assign(r,{title:title,desc:desc,location:loc,status:status,updatedAt:Date.now()});
+    await dbPut('records',r);closeModal();await loadRecs();render();toast('已更新');return;
+  }
+  if(!pending.file){toast('請先拍照或選擇照片');return;}
+  busy(true,'壓縮並燒錄浮水印…');
+  try{
+    const time=pending.time;
+    const out=await stamp(pending.file,{project:p.name,time:time,location:loc,title:title,status:status,stickers:stickers});
+    const rec={id:uid(),projectId:p.id,title:title,desc:desc,location:loc,status:status,createdAt:time,thumb:out.thumb,w:out.w,h:out.h};
+    await savePhotoRecord(rec,out.blob);
+    lsSet('lastLoc:'+p.id,loc);lsSet('lastSt:'+p.id,status);
+    closeModal();await loadRecs();
+    state.view='records';state.f='all';state.q='';render();toast('✔ 已儲存（已加浮水印）');
+  }catch(e){alert('照片處理失敗：'+(e&&e.message||e));}
+  finally{busy(false);}
+}
+
+/* ========== 影像處理：壓縮 + 浮水印 + 文字標記 ========== */
+async function loadBitmap(file){
+  if(window.createImageBitmap){
+    try{return await createImageBitmap(file,{imageOrientation:'from-image'});}catch(e){}
+  }
+  return new Promise((res,rej)=>{
+    const u=URL.createObjectURL(file),i=new Image();
+    i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),3000);};
+    i.onerror=()=>rej(new Error('無法讀取此照片格式'));i.src=u;
+  });
+}
+function cvBlob(c,q){return new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('輸出失敗')),'image/jpeg',q));}
+function fitText(ctx,t,max){
+  if(ctx.measureText(t).width<=max)return t;
+  while(t.length>1&&ctx.measureText(t+'…').width>max)t=t.slice(0,-1);
+  return t+'…';
+}
+function checksum(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return h.toString(16).toUpperCase().padStart(8,'0').slice(0,6);}
+function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+async function stamp(file,info){
+  const MAXW=1400;
+  const bmp=await loadBitmap(file);
+  const sw=bmp.width,sh=bmp.height;
+  const sc=Math.min(1,MAXW/sw);
+  const w=Math.round(sw*sc),h=Math.round(sh*sc);
+  const fs=Math.max(18,Math.round(w/40)),padv=Math.round(fs*.7),lh=Math.round(fs*1.5);
+  const barH=padv*2+lh*3-Math.round(fs*.2);
+  const c=document.createElement('canvas');c.width=w;c.height=h+barH;
+  const x=c.getContext('2d');
+  x.fillStyle='#000';x.fillRect(0,0,w,h+barH);
+  x.drawImage(bmp,0,0,w,h);
+  if(bmp.close)bmp.close();
+  /* 使用者手動文字標記（貼在照片主體，非底部資訊條） */
+  if(info.stickers&&info.stickers.length){
+    const sfs=Math.max(20,Math.round(w/28));
+    x.font='800 '+sfs+'px -apple-system,"PingFang TC","Noto Sans TC",sans-serif';
+    info.stickers.forEach((s,i)=>{
+      const tx=Math.round(w*0.06),ty=Math.round(h*0.1)+i*(sfs+14);
+      const tw=x.measureText(s.text).width+20;
+      x.fillStyle='rgba(220,38,38,.88)';rrect(x,tx-10,ty-sfs*0.8,tw,sfs*1.5,8);x.fill();
+      x.fillStyle='#fff';x.textBaseline='middle';x.fillText(s.text,tx,ty-sfs*0.05);
+    });
+  }
+  const px=Math.round(fs*.8),maxw=w-px*2;
+  x.textBaseline='middle';
+  const y1=h+padv+lh*.5-Math.round(fs*.1),y2=y1+lh,y3=y2+lh;
+  /* 第1行：工程名稱 */
+  x.font='800 '+Math.round(fs*1.1)+'px -apple-system,"PingFang TC","Noto Sans TC",sans-serif';
+  x.fillStyle='#ffc400';x.fillText(fitText(x,'工程：'+info.project,maxw),px,y1);
+  /* 第2行：時間 + 狀態標籤 */
+  x.font='700 '+fs+'px -apple-system,"PingFang TC","Noto Sans TC",monospace';
+  const tag=wmTag(info.status),tw=x.measureText(tag).width+fs;
+  x.fillStyle='#fff';x.fillText(fitText(x,'時間：'+fmt(info.time),maxw-tw-px),px,y2);
+  x.fillStyle=ST[info.status].c;rrect(x,w-px-tw,y2-fs*.75,tw,fs*1.5,fs*.3);x.fill();
+  x.fillStyle='#fff';x.textAlign='center';x.fillText(tag,w-px-tw/2,y2);x.textAlign='left';
+  /* 第3行：位置 / 項目 + 驗證碼 */
+  const code='#'+checksum(info.project+info.time+info.title+info.location);
+  x.font='600 '+Math.round(fs*.9)+'px -apple-system,"PingFang TC","Noto Sans TC",monospace';
+  const cw=x.measureText(code).width+px;
+  x.fillStyle='#e5e7eb';x.fillText(fitText(x,'位置：'+(info.location||'—')+'　項目：'+info.title,maxw-cw),px,y3);
+  x.fillStyle='#9ca3af';x.textAlign='right';x.fillText(code,w-px,y3);x.textAlign='left';
+  const blob=await cvBlob(c,0.82);
+  const tc=document.createElement('canvas');const tsc=360/w;tc.width=360;tc.height=Math.round((h+barH)*tsc);
+  tc.getContext('2d').drawImage(c,0,0,tc.width,tc.height);
+  return{blob:blob,thumb:tc.toDataURL('image/jpeg',0.7),w:w,h:h+barH};
+}
+
+/* ========== 照片對比 ========== */
+const locKey=r=>(r.location||'').trim()||'（未填位置）';
+function autoPick(loc){
+  const l=recs.filter(r=>locKey(r)===loc).sort((a,b)=>a.createdAt-b.createdAt);
+  const b=l.filter(r=>isBefore(r.status)),a=l.filter(r=>isAfter(r.status));
+  cmp.l=(b[0]||l[0]||{}).id||'';
+  cmp.r=(a[a.length-1]||l[l.length-1]||{}).id||'';
+}
+function compareFrom(id){
+  const r=recs.find(x=>x.id===id);if(!r)return;
+  cmp.loc=locKey(r);autoPick(cmp.loc);
+  if(isBefore(r.status))cmp.l=id;else cmp.r=id;
+  closeModal();go('compare');
+}
+function viewCompare(){
+  const locs=[...new Set(recs.map(locKey))];
+  if(recs.length<2||!locs.length)return '<div class="empty"><div class="big">🔀</div><p>至少需要 2 筆紀錄才能對比<br>建議同一位置分別拍「施工前」與「完工／已改善」</p></div>';
+  if(!locs.includes(cmp.loc)){cmp.loc=locs[0];autoPick(cmp.loc);}
+  const inLoc=recs.filter(r=>locKey(r)===cmp.loc).sort((a,b)=>a.createdAt-b.createdAt);
+  if(!inLoc.find(r=>r.id===cmp.l)||!inLoc.find(r=>r.id===cmp.r))autoPick(cmp.loc);
+  const opts=sel=>inLoc.map(r=>'<option value="'+r.id+'" '+(sel===r.id?'selected':'')+'>['+ST[r.status].n+'] '+esc(r.title)+' '+fmt(r.createdAt).slice(5,16)+'</option>').join('');
+  const box=(side,sel)=>{const r=recs.find(x=>x.id===sel);return '<div class="cmpbox"><select onchange="cmp.'+side+'=this.value;go(\'compare\')">'+opts(sel)+'</select>'+(r?'<img data-pid="'+r.id+'" src="'+r.thumb+'" onclick="openDetail(\''+r.id+'\')"><div class="cmpcap"><span class="badge" style="background:'+ST[r.status].c+'">'+ST[r.status].n+'</span> '+fmtD(r.createdAt)+'</div>':'')+'</div>';};
+  return '<button class="btn sm" style="margin-bottom:10px" onclick="go(\'more\')">← 返回更多</button><div class="card"><label class="f" style="margin-top:0">選擇施作位置</label><select class="in" onchange="cmp.loc=this.value;autoPick(cmp.loc);go(\'compare\')">'+locs.map(l=>'<option '+(l===cmp.loc?'selected':'')+'>'+esc(l)+'</option>').join('')+'</select>'+
+    '<div class="two" style="margin-top:10px"><button class="chip '+(cmp.layout==='side'?'on':'')+'" onclick="cmp.layout=\'side\';go(\'compare\')">◫ 並列</button><button class="chip '+(cmp.layout==='stack'?'on':'')+'" onclick="cmp.layout=\'stack\';go(\'compare\')">▤ 上下</button></div></div>'+
+    '<div class="cmpgrid '+cmp.layout+'">'+box('l',cmp.l)+box('r',cmp.r)+'</div><div class="gap"></div>'+
+    '<button class="btn y" onclick="exportCompare()">💾 匯出對比圖（儲存／分享）</button>';
+}
+async function exportCompare(){
+  const L=recs.find(x=>x.id===cmp.l),R=recs.find(x=>x.id===cmp.r),p=curProject();
+  if(!L||!R){toast('請選擇兩張照片');return;}
+  busy(true,'產生對比圖…');
+  try{
+    const imgs=await Promise.all([L,R].map(async r=>{const i=new Image();i.src=await getFull(r.id);await i.decode();return i;}));
+    const H=1100,ws=imgs.map(i=>Math.round(i.width*H/i.height)),gap=20,top=120,lab=70;
+    const W=ws[0]+ws[1]+gap*3,c=document.createElement('canvas');c.width=W;c.height=top+lab+H+gap;
+    const x=c.getContext('2d');x.fillStyle='#111827';x.fillRect(0,0,W,c.height);
+    x.textBaseline='middle';x.font='800 40px -apple-system,"PingFang TC",sans-serif';x.fillStyle='#ffc400';
+    x.fillText(fitText(x,p.name+'　'+cmp.loc,W-gap*2),gap,top/2);
+    let ox=gap;
+    [L,R].forEach((r,k)=>{
+      x.fillStyle=ST[r.status].c;rrect(x,ox,top,ws[k],lab-10,10);x.fill();
+      x.fillStyle='#fff';x.font='800 34px -apple-system,"PingFang TC",sans-serif';x.fillText(ST[r.status].n+'　'+fmtD(r.createdAt),ox+16,top+(lab-10)/2);
+      x.drawImage(imgs[k],ox,top+lab,ws[k],H);ox+=ws[k]+gap;
+    });
+    await saveBlob(await cvBlob(c,0.85),'compare_'+fmtD(Date.now()).replace(/-/g,'')+'.jpg');
+  }catch(e){alert('匯出失敗：'+(e&&e.message||e));}
+  finally{busy(false);}
+}
+
+/* ========== 月曆 ========== */
+async function collectDay(dateStr){
+  const out=[];
+  recs.filter(r=>fmtD(r.createdAt)===dateStr).forEach(r=>out.push({ic:'📷',t:r.title,s:ST[r.status].n,raw:r}));
+  (mdata.materials||[]).filter(x=>x.date===dateStr).forEach(x=>out.push({ic:matCatIcon(x.category),t:x.name,s:x.category==='零用金'?(x.pettyType||'零用金')+' '+money(x.amount):(x.category||'')+'　'+(x.qty||'')+(x.unit||''),raw:x}));
+  (mdata.meetings||[]).filter(x=>x.date===dateStr).forEach(x=>out.push({ic:'🗒',t:x.title,s:'會議',raw:x}));
+  (mdata.memos||[]).filter(x=>x.date===dateStr).forEach(x=>out.push({ic:'📝',t:x.content?x.content.slice(0,20):'備忘錄',s:'備忘',raw:x}));
+  (mdata.attendance||[]).filter(x=>x.date===dateStr).forEach(x=>out.push({ic:'🧍',t:x.worker||'—',s:x.status||'出工',raw:x}));
+  (mdata.progCats||[]).forEach(c=>{
+    (c.workDays||[]).filter(x=>x.date===dateStr).forEach(x=>out.push({ic:'🛠',t:c.name+(x.subName?'／'+x.subName:'')+' 施工',s:(x.workers||0)+'人到場',raw:x}));
+    (c.subItems||[]).forEach(s=>(s.events||[]).filter(e=>e.date===dateStr).forEach(e=>out.push({ic:e.type==='submit'?'📮':'✅',t:c.name+'／'+s.name,s:e.type==='submit'?'已送審':'審核通過',raw:e})));
+  });
+  return out;
+}
+async function renderCalendar(){
+  await Promise.all(['materials','meetings','memos','attendance','progCats'].map(loadMod));
+  const m=$('main');if(state.view!=='calendar')return;
+  const y=cal.y,mo=cal.m,dim=daysInMonth(y,mo),startWd=new Date(y,mo,1).getDay();
+  const allDates=new Set();
+  recs.forEach(r=>allDates.add(fmtD(r.createdAt)));
+  ['materials','meetings','memos','attendance'].forEach(k=>(mdata[k]||[]).forEach(x=>{if(x.date)allDates.add(x.date);}));
+  (mdata.progCats||[]).forEach(c=>{
+    (c.workDays||[]).forEach(x=>{if(x.date)allDates.add(x.date);});
+    (c.subItems||[]).forEach(s=>(s.events||[]).forEach(e=>{if(e.date)allDates.add(e.date);}));
+  });
+  let cells='';
+  const wd=['日','一','二','三','四','五','六'];
+  wd.forEach(w=>cells+='<div class="wd">'+w+'</div>');
+  for(let i=0;i<startWd;i++)cells+='<div class="calday other"></div>';
+  const ts=todayStr();
+  for(let d=1;d<=dim;d++){
+    const ds=y+'-'+p2(mo+1)+'-'+p2(d);
+    const has=allDates.has(ds);
+    cells+='<div class="calday '+(ds===ts?'today':'')+'" onclick="openDay(\''+ds+'\')">'+d+(has?'<div class="dots"><i></i></div>':'')+'</div>';
+  }
+  m.innerHTML='<button class="btn sm" style="margin-bottom:10px" onclick="go(\'more\')">← 返回更多</button>'+
+    '<div class="card"><div class="calhead"><button class="calnavb" onclick="calNav(-1)">‹</button><b>'+y+' 年 '+(mo+1)+' 月</b><button class="calnavb" onclick="calNav(1)">›</button></div>'+
+    '<div class="calgrid">'+cells+'</div></div>'+
+    '<div class="mut" style="text-align:center">點日期查看當天所有紀錄</div>';
+}
+function calNav(d){cal.m+=d;if(cal.m<0){cal.m=11;cal.y--;}if(cal.m>11){cal.m=0;cal.y++;}renderCalendar();}
+async function openDay(ds){
+  cal.sel=ds;
+  const items=await collectDay(ds);
+  modal('<div class="sheet-h"><b>'+ds+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    (items.length?items.map(it=>'<div class="dlist"><span class="ic2">'+it.ic+'</span><div style="flex:1"><b>'+esc(it.t)+'</b><div class="mut">'+esc(it.s)+'</div></div></div>').join(''):'<div class="empty">這天沒有任何紀錄</div>')+
+    '<div class="gap"></div><button class="btn y" onclick="shareDay(\''+ds+'\')">📤 分享當日摘要（LINE／複製）</button>');
+}
+async function shareDay(ds){
+  const items=await collectDay(ds);
+  const p=curProject();
+  const txt=(p?p.name+'　':'')+ds+' 現場摘要\n'+(items.length?items.map(it=>it.ic+' '+it.t+'｜'+it.s).join('\n'):'（無紀錄）');
+  shareText('現場日報',txt);
+}
+
+/* ========== 工程進度（分項工程加權 SOP + 甘特圖） ========== */
+const FLOOR_OPTS=['1F','2F','3F','4F','5F','B1','屋突/機房','全棟'];
+const PREP_OPTS=['圖面'];
+const PIPE_OPTS=['銅管配管工程','水管配管工程','排水管配管工程','保溫管配管工程'];
+const PROG_CATALOG=[
+  {key:'prep',baseKey:'prep',baseWeight:5,name:'前期規劃與設備送審',mode:'percent',subKind:'approval',subCatalog:PREP_OPTS},
+  {key:'equip_in',baseKey:'equip',baseWeight:35,name:'設備進場',mode:'qty'},
+  {key:'equip_hoist',baseKey:'equip',baseWeight:35,name:'設備吊裝',mode:'qty'},
+  {key:'piping',baseKey:'piping',baseWeight:25,name:'配管工程',mode:'percent',subKind:'percent',subCatalog:PIPE_OPTS},
+  {key:'electrical',baseKey:'electrical',baseWeight:15,name:'配電工程',mode:'percent',subKind:'percent',subCatalog:null},
+  {key:'tab',baseKey:'tab',baseWeight:15,name:'系統試車與調整',mode:'percent',subKind:'done',subCatalog:null},
+  {key:'handover',baseKey:'handover',baseWeight:5,name:'竣工驗收與移交',mode:'percent',subKind:'percent',subCatalog:null}
+];
+const APR_LABEL={none:'未送審',pending:'待審核',approved:'已審核通過'};
+const APR_PCT={none:0,pending:50,approved:100};
+function catPercent(c){
+  const items=c.subItems||[];
+  if(c.mode==='qty'){
+    const tot=items.reduce((s,x)=>s+(parseFloat(x.total)||0),0);
+    const done=items.reduce((s,x)=>s+Math.min(parseFloat(x.done)||0,parseFloat(x.total)||0),0);
+    return tot?Math.round(done/tot*100):0;
+  }
+  if(!items.length)return Math.round(parseFloat(c.manualPercent)||0);
+  return Math.round(items.reduce((s,x)=>s+(parseFloat(x.percent)||0),0)/items.length);
+}
+function catWeight(c,cats){
+  if(c.na)return 0;
+  const n=cats.filter(x=>x.baseKey===c.baseKey&&!x.na).length||1;
+  return (parseFloat(c.baseWeight)||0)/n;
+}
+function overallProgress(cats){
+  const total=cats.reduce((s,c)=>s+catWeight(c,cats),0);
+  if(!total)return cats.length?Math.round(cats.reduce((s,c)=>s+catPercent(c),0)/cats.length):0;
+  return Math.round(cats.reduce((s,c)=>s+catWeight(c,cats)*catPercent(c),0)/total);
+}
+async function ensureProgCats(){
+  const p=curProject();if(!p)return;
+  await loadMod('progCats');
+  const existing=new Set((mdata.progCats||[]).map(c=>c.catKey));
+  const missing=PROG_CATALOG.filter(e=>!existing.has(e.key));
+  let order=(mdata.progCats||[]).length;
+  for(const e of missing){
+    await dbPut('progCats',{id:uid(),projectId:p.id,createdAt:Date.now(),order:order++,name:e.name,catKey:e.key,baseKey:e.baseKey,baseWeight:e.baseWeight,mode:e.mode,subKind:e.subKind||'percent',subCatalog:e.subCatalog||null,start:'',end:'',manualPercent:0,workDays:[],subItems:[]});
+  }
+  // 修正舊資料：配電/試車調整/竣工驗收 不應再帶有內建樓層選單，改為一律手動輸入；系統試車與調整改為完成試車自動計算百分比
+  let fixed=false;
+  for(const c of (mdata.progCats||[])){
+    const tpl=PROG_CATALOG.find(e=>e.key===c.catKey);
+    if(!tpl)continue;
+    if((tpl.subCatalog||null)===null&&c.subCatalog){
+      c.subCatalog=null;await dbPut('progCats',c);fixed=true;
+    }
+    if(tpl.subKind&&c.subKind!==tpl.subKind){
+      c.subKind=tpl.subKind;await dbPut('progCats',c);fixed=true;
+    }
+  }
+  if(missing.length||fixed)await loadMod('progCats');
+}
+async function renderProgress(){
+  await ensureProgCats();
+  const m=$('main');if(state.view!=='progress')return;
+  const cats=(mdata.progCats||[]).slice().sort((a,b)=>(a.order||0)-(b.order||0));
+  const now=new Date(),ym=now.getFullYear()+'-'+p2(now.getMonth()+1);
+  const monthWork=cats.reduce((s,c)=>s+(c.workDays||[]).filter(x=>(x.date||'').startsWith(ym)).reduce((s2,x)=>s2+(parseFloat(x.workers)||0),0),0);
+  const overall=overallProgress(cats);
+  const p=curProject();
+  let daysStat='';
+  if(p&&p.contractEndDate){
+    const todayMid=new Date();todayMid.setHours(0,0,0,0);
+    const endMid=new Date(p.contractEndDate+'T00:00:00');
+    const remain=Math.round((endMid-todayMid)/86400000);
+    daysStat='<div class="stat"><b style="'+(remain<0?'color:#dc2626':'')+'">'+(remain<0?'逾期'+Math.abs(remain):remain)+'</b><span>距離合約完工日（天）</span></div>';
+  }
+  let html='<div class="card"><h2 style="margin:0 0 8px">工程進度總覽</h2><div class="stats">'+
+    '<div class="stat"><b>'+overall+'%</b><span>總體進度（加權）</span></div>'+
+    '<div class="stat"><b>'+monthWork+'</b><span>本月出工數</span></div>'+
+    '<div class="stat"><b>'+cats.filter(c=>!c.na&&catPercent(c)>=100).length+'</b><span>已完成分項</span></div>'+daysStat+'</div></div>';
+  if(!cats.length)html+='<div class="empty"><div class="big">📈</div><p>尚無分項工程</p></div>';
+  cats.forEach(c=>{
+    if(c.na){
+      html+='<div class="pitem" style="opacity:.45;filter:grayscale(1)" onclick="openCatDetail(\''+c.id+'\')"><div class="top"><span>'+esc(c.name)+'</span><span class="badge" style="background:#6b7280">🚫 無此工程</span></div></div>';
+      return;
+    }
+    const pct=catPercent(c),done=pct>=100,today=todayStr(),wdays=c.workDays||[];
+    const trackWork=c.catKey!=='prep'&&c.catKey!=='handover';
+    const distinctDays=new Set(wdays.map(x=>x.date)).size;
+    const totalWorkers=wdays.reduce((s,x)=>s+(parseFloat(x.workers)||0),0);
+    const multi=(c.subItems||[]).length>=2;
+    const todayEntry=wdays.find(x=>x.date===today&&!x.subId);
+    const workedToday=!!todayEntry;
+    const todayMultiEntries=multi?wdays.filter(x=>x.date===today):[];
+    const todayMultiWorkers=todayMultiEntries.reduce((s,x)=>s+(parseFloat(x.workers)||0),0);
+    html+='<div class="pitem" onclick="openCatDetail(\''+c.id+'\')"><div class="top"><span>'+esc(c.name)+'</span><span>'+(done?'<span class="badge" style="background:#16a34a">✅ 已完工</span> ':'')+pct+'%</span></div><div class="pbar"><i style="width:'+pct+'%"></i></div>'+
+      (trackWork?(
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;flex-wrap:wrap">'+
+      '<span class="mut" style="font-size:12px">已施工 <b>'+distinctDays+'</b> 天・共 <b>'+totalWorkers+'</b> 人次'+(c.start||c.end?'　'+(c.start||'—')+' ～ '+(c.end||'—'):'')+'</span>'+
+      (done?'':
+        multi?
+          '<button class="btn sm" style="width:auto;min-height:34px;padding:0 10px;flex:none;'+(todayMultiEntries.length?'background:#16a34a;color:#fff':'')+'" onclick="event.stopPropagation();openCatDetail(\''+c.id+'\')">'+(todayMultiEntries.length?'✅ 今日已記錄（'+todayMultiWorkers+'人）':'🛠 本日進場施工（選細項）')+'</button>'
+        :(workedToday?
+          '<button class="btn sm" style="width:auto;min-height:34px;padding:0 10px;flex:none;background:#16a34a;color:#fff" onclick="event.stopPropagation();toggleWorkToday(\''+c.id+'\')">✅ 今日已記錄（'+(todayEntry.workers||0)+'人）</button>'
+          :'<span onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:6px;flex:none">'+
+            '<input type="number" min="1" value="1" id="wk_'+c.id+'" style="width:52px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-align:center">'+
+            '<span class="mut" style="font-size:12px">人</span>'+
+            '<button class="btn sm" style="width:auto;min-height:34px;padding:0 10px" onclick="event.stopPropagation();toggleWorkToday(\''+c.id+'\',\'wk_'+c.id+'\')">🛠 本日進場施工</button>'+
+          '</span>'))+
+      '</div>'
+      ):(c.start||c.end?'<div style="margin-top:8px"><span class="mut" style="font-size:12px">'+(c.start||'—')+' ～ '+(c.end||'—')+'</span></div>':''))+
+      '</div>';
+  });
+  if(cats.some(c=>!c.na&&c.start&&c.end)){
+    html+='<div class="pfloor">📊 簡易甘特圖（'+(mo_1(now))+' 月）</div><div class="gwrap"><div style="min-width:520px">';
+    const dim=daysInMonth(now.getFullYear(),now.getMonth());
+    cats.filter(c=>!c.na&&c.start&&c.end).forEach(c=>{
+      const sd=new Date(c.start+'T00:00:00'),ed=new Date(c.end+'T00:00:00');
+      const sD=(sd.getMonth()===now.getMonth())?sd.getDate():1;
+      const eD=(ed.getMonth()===now.getMonth())?ed.getDate():dim;
+      const left=Math.max(0,(sD-1)/dim*100),width=Math.max(4,(eD-sD+1)/dim*100);
+      html+='<div class="grow"><div class="glabel">'+esc(c.name)+'</div><div class="gtrack"><div class="gbar" style="left:'+left+'%;width:'+width+'%">'+catPercent(c)+'%</div></div></div>';
+    });
+    html+='</div></div>';
+  }
+  m.innerHTML=html;
+}
+function mo_1(d){return d.getMonth()+1;}
+async function toggleWorkToday(id,workersInputId,subId,subName){
+  const c=(mdata.progCats||[]).find(x=>x.id===id);if(!c)return;
+  const t=todayStr(),sid=subId||'';c.workDays=c.workDays||[];
+  const idx=c.workDays.findIndex(x=>x.date===t&&(x.subId||'')===sid);
+  let msg;
+  if(idx>=0){c.workDays.splice(idx,1);msg='已取消本日記錄';}
+  else{
+    let n=1;
+    if(workersInputId){const el=document.getElementById(workersInputId);if(el)n=Math.max(1,parseInt(el.value)||1);}
+    c.workDays.push({date:t,workers:n,subId:sid,subName:subName||''});c.workDays.sort((a,b)=>a.date.localeCompare(b.date));
+    msg='已記錄本日施工'+(subName?'（'+subName+'　'+n+'人）':'（'+n+'人）');
+  }
+  await dbPut('progCats',c);await loadMod('progCats');renderProgress();
+  if($('modal').classList.contains('show'))openCatDetail(id);
+  toast(msg);
+}
+function openCatDetail(id){
+  const c=(mdata.progCats||[]).find(x=>x.id===id);if(!c)return;
+  modal(catDetailHTML(c));
+}
+function catDetailHTML(c){
+  if(c.na){
+    return '<div class="sheet-h"><b>'+esc(c.name)+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+      '<div class="stat" style="margin-bottom:10px;background:rgba(107,114,128,.15)"><b style="font-size:20px">🚫 無此工程</b><span>不列入本案進度計算，權重已按比例分配給其他分項工程</span></div>'+
+      '<div class="gap"></div><button class="btn dark" onclick="toggleCatNA(\''+c.id+'\')">↩️ 恢復此工程</button>';
+  }
+  const pct=catPercent(c),done=pct>=100;
+  let body='<div class="sheet-h"><b>'+esc(c.name)+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<div class="stat" style="margin-bottom:10px'+(done?';background:rgba(22,163,74,.15)':'')+'"><b style="font-size:22px">'+pct+'%'+(done?' ✅ 已完工':'')+'</b><span>目前進度</span></div>'+
+    '<div class="two"><div><label class="f" style="margin-top:0">開始日期</label><input class="in" type="date" value="'+(c.start||'')+'" onchange="updateCatField(\''+c.id+'\',\'start\',this.value)"></div><div><label class="f" style="margin-top:0">預計完成</label><input class="in" type="date" value="'+(c.end||'')+'" onchange="updateCatField(\''+c.id+'\',\'end\',this.value)"></div></div>'+
+    (()=>{
+      if(c.catKey==='prep'||c.catKey==='handover')return '';
+      const wdays=c.workDays||[],today=todayStr();
+      const distinctDays=new Set(wdays.map(x=>x.date)).size;
+      const totalWorkers=wdays.reduce((s,x)=>s+(parseFloat(x.workers)||0),0);
+      const last=wdays.length?wdays[wdays.length-1]:null;
+      let s='<div class="mut" style="margin:6px 2px">🛠 已施工 <b>'+distinctDays+'</b> 天・共 <b>'+totalWorkers+'</b> 人次'+(last?'（最近：'+last.date+(last.subName?'　'+esc(last.subName):'')+'　'+last.workers+'人）':'')+'</div>';
+      if(done)return s;
+      const subs=c.subItems||[];
+      if(subs.length>=2){
+        s+='<div class="mut" style="font-size:12px;margin:6px 2px 4px">今日各細項施工人數：</div>';
+        subs.forEach(sub=>{
+          const nm=esc(sub.name).replace(/'/g,"\\'");
+          const e=wdays.find(x=>x.date===today&&x.subId===sub.id);
+          s+='<div class="ckrow" style="align-items:center">'+
+            '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(sub.name)+'</span>'+
+            (e?'<span class="mut">'+e.workers+'人</span><button class="rmbtn" onclick="toggleWorkToday(\''+c.id+'\',null,\''+sub.id+'\',\''+nm+'\')">✕</button>'
+              :'<input type="number" min="1" value="1" id="wk_'+c.id+'_'+sub.id+'" style="width:52px;height:36px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-align:center">'+
+               '<button class="btn sm" style="width:auto;min-height:36px;padding:0 10px" onclick="toggleWorkToday(\''+c.id+'\',\'wk_'+c.id+'_'+sub.id+'\',\''+sub.id+'\',\''+nm+'\')">🛠 記錄</button>')+
+            '</div>';
+        });
+      }else{
+        const todayEntry=wdays.find(x=>x.date===today);
+        if(todayEntry)s+='<button class="btn sm" style="background:#16a34a;color:#fff" onclick="toggleWorkToday(\''+c.id+'\')">✅ 今日已記錄（'+(todayEntry.workers||0)+'人，點擊取消）</button>';
+        else s+='<div style="display:flex;align-items:center;gap:8px"><input type="number" min="1" value="1" id="cdWorkers" style="width:60px;height:40px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-align:center"><span class="mut">人</span><button class="btn sm" style="flex:1" onclick="toggleWorkToday(\''+c.id+'\',\'cdWorkers\')">🛠 本日進場施工</button></div>';
+      }
+      return s;
+    })();
+
+  if(c.mode==='qty'){
+    const isHoist=c.catKey==='equip_hoist';
+    body+='<div class="pfloor" style="margin-top:14px">'+(isHoist?'設備項目（同步自設備進場）':'細項（依數量計算百分比）')+'</div>';
+    (c.subItems||[]).forEach(s=>{
+      if(isHoist){
+        body+='<div class="ckrow" style="align-items:center"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(s.name)+'</span>'+
+          '<span class="mut" style="flex:none">共'+(s.total||0)+'</span>'+
+          '<span class="mut">／</span>'+
+          '<input type="number" style="width:60px" value="'+(s.done||0)+'" title="已吊裝" onchange="updateSubField(\''+c.id+'\',\''+s.id+'\',\'done\',+this.value)">'+
+          '</div>';
+      }else{
+        body+='<div class="ckrow"><input type="text" value="'+esc(s.name)+'" onchange="updateSubField(\''+c.id+'\',\''+s.id+'\',\'name\',this.value)">'+
+          '<input type="number" style="width:60px" value="'+(s.total||0)+'" title="總數" onchange="updateSubField(\''+c.id+'\',\''+s.id+'\',\'total\',+this.value)">'+
+          '<span class="mut">／</span>'+
+          '<input type="number" style="width:60px" value="'+(s.done||0)+'" title="已完成" onchange="updateSubField(\''+c.id+'\',\''+s.id+'\',\'done\',+this.value)">'+
+          '<button class="rmbtn" onclick="delSubItem(\''+c.id+'\',\''+s.id+'\')">✕</button></div>';
+      }
+    });
+    if(!(c.subItems||[]).length)body+='<div class="mut" style="margin-bottom:8px">'+(isHoist?'尚無設備項目，請先於「設備進場」新增':'尚無設備項目，請先新增')+'</div>';
+    if(!isHoist)body+='<button class="btn sm" onclick="addSubItem(\''+c.id+'\')">＋ 新增設備項目</button>';
+  }else if(c.subKind==='approval'){
+    body+='<div class="pfloor" style="margin-top:14px">送審項目</div>';
+    (c.subItems||[]).forEach(s=>{
+      const st=s.status||'none';
+      body+='<div class="ckrow" style="align-items:center;flex-wrap:wrap">'+
+        '<span style="flex:1;min-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(s.name)+'</span>'+
+        '<span class="badge" style="background:'+(st==='approved'?'#16a34a':st==='pending'?'#d97706':'#6b7280')+'">'+APR_LABEL[st]+'</span>'+
+        (st==='none'?'<button class="btn sm" style="width:auto;min-height:34px;padding:0 10px" onclick="submitForReview(\''+c.id+'\',\''+s.id+'\')">📮 送審</button>':'')+
+        (st==='pending'?'<button class="btn sm" style="width:auto;min-height:34px;padding:0 10px;background:#16a34a;color:#fff" onclick="approveReview(\''+c.id+'\',\''+s.id+'\')">✅ 審核通過</button>':'')+
+        '<button class="rmbtn" onclick="delSubItem(\''+c.id+'\',\''+s.id+'\')">✕</button></div>';
+    });
+    if(!(c.subItems||[]).length)body+='<div class="mut" style="margin-bottom:8px">尚無送審項目，請先新增</div>';
+    body+='<button class="btn sm" onclick="addSubItem(\''+c.id+'\')">＋ 新增送審項目</button>';
+  }else if(c.subKind==='done'){
+    body+='<div class="pfloor" style="margin-top:14px">試車調整項目（新增後依完成比例自動計算百分比）</div>';
+    (c.subItems||[]).forEach(s=>{
+      const isDone=(s.percent||0)>=100;
+      body+='<div class="ckrow" style="align-items:center">'+
+        '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(s.name)+'</span>'+
+        (isDone?'<span class="badge" style="background:#16a34a">✅ 已完成試車</span><button class="btn sm" style="width:auto;min-height:34px;padding:0 8px" onclick="updateSubField(\''+c.id+'\',\''+s.id+'\',\'percent\',0)">↩️ 取消</button>'
+          :'<button class="btn sm" style="width:auto;min-height:34px;padding:0 10px" onclick="updateSubField(\''+c.id+'\',\''+s.id+'\',\'percent\',100)">✅ 完成試車</button>')+
+        '<button class="rmbtn" onclick="delSubItem(\''+c.id+'\',\''+s.id+'\')">✕</button></div>';
+    });
+    if(!(c.subItems||[]).length)body+='<div class="mut" style="margin-bottom:8px">尚無試車調整項目，請先新增（例如：冰水主機試車、送回風扇試車）</div>';
+    body+='<button class="btn sm" onclick="addSubItem(\''+c.id+'\')">＋ 新增試車調整項目</button>';
+  }else{
+    body+='<div class="pfloor" style="margin-top:14px">細項（可新增，若無細項則用下方整體百分比）</div>';
+    if((c.subItems||[]).length){
+      (c.subItems||[]).forEach(s=>{
+        body+='<div class="ckrow" style="align-items:center">'+
+          '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(s.name)+'</span>'+
+          '<input type="range" min="0" max="100" value="'+(s.percent||0)+'" style="width:90px" oninput="this.nextElementSibling.textContent=this.value+\'%\'" onchange="updateSubField(\''+c.id+'\',\''+s.id+'\',\'percent\',+this.value)">'+
+          '<span class="mut" style="width:38px;text-align:right;flex:none">'+(s.percent||0)+'%</span>'+
+          '<button class="rmbtn" onclick="delSubItem(\''+c.id+'\',\''+s.id+'\')">✕</button></div>';
+      });
+    }else{
+      body+='<label class="f">整體百分比：<span id="cdMP">'+(c.manualPercent||0)+'</span>%</label><input type="range" min="0" max="100" value="'+(c.manualPercent||0)+'" oninput="$(\'cdMP\').textContent=this.value" onchange="updateCatField(\''+c.id+'\',\'manualPercent\',+this.value)">';
+    }
+    body+='<button class="btn sm" style="margin-top:6px" onclick="addSubItem(\''+c.id+'\')">＋ 新增細項</button>';
+  }
+  body+='<div class="gap"></div><button class="btn red" onclick="toggleCatNA(\''+c.id+'\')">🚫 無此工程（不列入進度計算）</button>';
+  return body;
+}
+async function updateCatField(id,field,value){
+  const c=(mdata.progCats||[]).find(x=>x.id===id);if(!c)return;
+  c[field]=value;await dbPut('progCats',c);await loadMod('progCats');renderProgress();
+  if($('modal').classList.contains('show'))openCatDetail(id);
+}
+async function updateSubField(catId,subId,field,value){
+  const c=(mdata.progCats||[]).find(x=>x.id===catId);if(!c)return;
+  const s=(c.subItems||[]).find(x=>x.id===subId);if(!s)return;
+  s[field]=value;await dbPut('progCats',c);
+  if(c.catKey==='equip_in'&&(field==='name'||field==='total'))await syncEquipHoist(c);
+  await loadMod('progCats');renderProgress();
+  if($('modal').classList.contains('show'))openCatDetail(catId);
+}
+async function syncEquipHoist(equipInCat){
+  const hoist=(mdata.progCats||[]).find(x=>x.catKey==='equip_hoist'&&x.projectId===equipInCat.projectId);
+  if(!hoist)return;
+  const inSubs=equipInCat.subItems||[];
+  const hoistMap=new Map((hoist.subItems||[]).map(s=>[s.id,s]));
+  hoist.subItems=inSubs.map(s=>{
+    const ex=hoistMap.get(s.id);
+    return {id:s.id,name:s.name,total:s.total,done:ex?(ex.done||0):0};
+  });
+  await dbPut('progCats',hoist);
+}
+async function submitForReview(catId,subId){
+  const c=(mdata.progCats||[]).find(x=>x.id===catId);if(!c)return;
+  const s=(c.subItems||[]).find(x=>x.id===subId);if(!s)return;
+  s.status='pending';s.percent=APR_PCT.pending;
+  s.events=s.events||[];s.events.push({date:todayStr(),type:'submit'});
+  await dbPut('progCats',c);await loadMod('progCats');renderProgress();
+  if($('modal').classList.contains('show'))openCatDetail(catId);
+  toast('已送審，記錄於月曆');
+}
+async function approveReview(catId,subId){
+  const c=(mdata.progCats||[]).find(x=>x.id===catId);if(!c)return;
+  const s=(c.subItems||[]).find(x=>x.id===subId);if(!s)return;
+  s.status='approved';s.percent=APR_PCT.approved;
+  s.events=s.events||[];s.events.push({date:todayStr(),type:'approve'});
+  await dbPut('progCats',c);await loadMod('progCats');renderProgress();
+  if($('modal').classList.contains('show'))openCatDetail(catId);
+  toast('已審核通過，記錄於月曆');
+}
+let addSubCtx='';
+function addSubItem(catId){
+  const c=(mdata.progCats||[]).find(x=>x.id===catId);if(!c)return;
+  addSubCtx=catId;
+  const isQty=c.mode==='qty',catalog=c.subCatalog||null;
+  if(isQty||!catalog){
+    modal('<div class="sheet-h"><b>新增細項</b><button class="x" onclick="openCatDetail(\''+catId+'\')">✕</button></div>'+
+      '<label class="f" style="margin-top:0">項目名稱 *</label><input class="in" id="siName" placeholder="'+(isQty?'例如：冰水主機':'例如：熱水管配管')+'">'+
+      (isQty?'<label class="f">總數量</label><input class="in" type="number" id="siTotal" value="1">':'')+
+      '<div class="gap"></div><button class="btn dark" onclick="saveSubItem()">💾 新增</button>');
+    return;
+  }
+  modal('<div class="sheet-h"><b>'+(c.subKind==='approval'?'新增送審項目':'新增細項')+'</b><button class="x" onclick="openCatDetail(\''+catId+'\')">✕</button></div>'+
+    '<label class="f" style="margin-top:0">選擇項目</label><select class="in" id="siSel" onchange="$(\'siCustom\').style.display=this.value===\'__other\'?\'block\':\'none\'">'+
+    catalog.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('')+'<option value="__other">其他（自行輸入）</option></select>'+
+    '<input class="in" id="siCustom" placeholder="輸入自訂名稱" style="display:none;margin-top:8px">'+
+    '<div class="gap"></div><button class="btn dark" onclick="saveSubItem()">💾 新增</button>');
+}
+async function saveSubItem(){
+  const catId=addSubCtx,c=(mdata.progCats||[]).find(x=>x.id===catId);if(!c)return;
+  let name;
+  if($('siSel')){name=$('siSel').value==='__other'?$('siCustom').value.trim():$('siSel').value;}
+  else name=$('siName').value.trim();
+  if(!name){toast('請輸入項目名稱');return;}
+  let s;
+  if(c.mode==='qty')s={id:uid(),name:name,total:parseFloat($('siTotal').value)||1,done:0};
+  else if(c.subKind==='approval')s={id:uid(),name:name,status:'none',percent:0,events:[]};
+  else s={id:uid(),name:name,percent:0};
+  c.subItems=c.subItems||[];c.subItems.push(s);
+  await dbPut('progCats',c);
+  if(c.catKey==='equip_in')await syncEquipHoist(c);
+  await loadMod('progCats');renderProgress();
+  openCatDetail(catId);
+}
+async function delSubItem(catId,subId){
+  const c=(mdata.progCats||[]).find(x=>x.id===catId);if(!c)return;
+  if(!(await askConfirm('確定刪除此細項？')))return;
+  c.subItems=(c.subItems||[]).filter(x=>x.id!==subId);
+  await dbPut('progCats',c);
+  if(c.catKey==='equip_in')await syncEquipHoist(c);
+  await loadMod('progCats');renderProgress();
+  openCatDetail(catId);
+}
+async function toggleCatNA(id){
+  const c=(mdata.progCats||[]).find(x=>x.id===id);if(!c)return;
+  const turningOn=!c.na;
+  if(turningOn){
+    if(!(await askConfirm('確定將「'+c.name+'」標記為無此工程？此分項的權重將依比例分配給其他分項工程，之後仍可恢復。')))return;
+  }
+  c.na=turningOn;
+  await dbPut('progCats',c);closeModal();await loadMod('progCats');renderProgress();
+  toast(turningOn?'已標記為無此工程':'已恢復此工程');
+}
+
+/* ========== 通用模組 CRUD（材料訂單/施工人員/會議記錄/備忘錄/出勤） ========== */
+const MODULES={
+  workers:{title:'施工人員資料',icon:'👷',fields:[
+    {k:'name',label:'姓名 *',type:'text',req:true},
+    {k:'company',label:'廠商／公司',type:'text'},
+    {k:'phone',label:'聯絡電話',type:'text'},
+    {k:'safetyCard',label:'職安卡到期日',type:'date'},
+    {k:'healthCheck',label:'體檢日期',type:'date'},
+    {k:'insurance',label:'勞保狀態',type:'select',options:['已投保','未投保']},
+    {k:'equipment',label:'攜帶機具（逗號分隔）',type:'text'}
+  ],line:it=>esc(it.name)+'　'+esc(it.company||''),sub:it=>expBadges(it)},
+  meetings:{title:'會議記錄',icon:'🗒',fields:[
+    {k:'date',label:'日期',type:'date',req:true,def:todayStr()},
+    {k:'title',label:'會議主題 *',type:'text',req:true},
+    {k:'attendees',label:'出席人員',type:'text'},
+    {k:'content',label:'紀錄內容',type:'textarea'}
+  ],line:it=>esc(it.title),sub:it=>it.date+'　'+esc(it.attendees||'')},
+  memos:{title:'備忘錄',icon:'📝',fields:[
+    {k:'date',label:'日期',type:'date',req:true,def:todayStr()},
+    {k:'content',label:'內容 *',type:'textarea',req:true}
+  ],line:it=>esc((it.content||'').slice(0,24)),sub:it=>it.date},
+  attendance:{title:'出勤紀錄',icon:'🧍',fields:[
+    {k:'date',label:'日期',type:'date',req:true,def:todayStr()},
+    {k:'worker',label:'人員姓名',type:'text'},
+    {k:'status',label:'狀態',type:'select',options:['出工','半天','請假']},
+    {k:'hours',label:'工時（小時）',type:'number'},
+    {k:'note',label:'備註',type:'textarea'}
+  ],line:it=>esc(it.worker||'—')+'　'+esc(it.status||''),sub:it=>it.date+(it.hours?'　'+it.hours+' hr':'')}
+};
+function expBadges(it){
+  let s='';const today=todayStr();
+  const soon=(d)=>{if(!d)return '';const diff=(new Date(d)-new Date(today))/86400000;if(diff<0)return 'exp';if(diff<=30)return 'soon';return '';};
+  if(soon(it.safetyCard))s+='<span class="expwarn">職安卡'+(soon(it.safetyCard)==='exp'?'已過期':'即將到期')+'</span> ';
+  if(soon(it.healthCheck))s+='<span class="expwarn">體檢提醒</span> ';
+  return s||esc(it.phone||'—');
+}
+let genCtx={key:'',id:''};
+function openGenericForm(key,id){
+  const p=curProject();if(!p){toast('請先新增案場');go('more');return;}
+  genCtx={key:key,id:id||''};
+  const cfg=MODULES[key];
+  const it=id?(mdata[key]||[]).find(x=>x.id===id):null;
+  const fieldsHtml=cfg.fields.map(f=>{
+    const val=it?(it[f.k]!=null?it[f.k]:''):(f.def||'');
+    if(f.type==='textarea')return '<label class="f">'+f.label+'</label><textarea class="in" id="gf_'+f.k+'">'+esc(val)+'</textarea>';
+    if(f.type==='select')return '<label class="f">'+f.label+'</label><select class="in" id="gf_'+f.k+'">'+f.options.map(o=>'<option '+(val===o?'selected':'')+'>'+o+'</option>').join('')+'</select>';
+    return '<label class="f">'+f.label+'</label><input class="in" id="gf_'+f.k+'" type="'+f.type+'" value="'+esc(val)+'">';
+  }).join('');
+  modal('<div class="sheet-h"><b>'+(it?'編輯':'新增')+cfg.title+'</b><button class="x" onclick="closeModal()">✕</button></div>'+fieldsHtml+
+    '<div class="gap"></div><button class="btn dark" onclick="saveGeneric()">💾 儲存</button>'+
+    (it?'<div class="gap"></div><button class="btn red" onclick="delGeneric()">🗑 刪除</button>':''));
+}
+async function saveGeneric(){
+  const key=genCtx.key,cfg=MODULES[key],p=curProject();
+  const data={};
+  for(const f of cfg.fields){
+    const el=$('gf_'+f.k);const v=el.value.trim?el.value.trim():el.value;
+    if(f.req&&!v){toast('請填寫「'+f.label.replace(' *','')+'」');el.focus();return;}
+    data[f.k]=v;
+  }
+  let rec=genCtx.id?(mdata[key]||[]).find(x=>x.id===genCtx.id):{id:uid(),projectId:p.id,createdAt:Date.now()};
+  Object.assign(rec,data);
+  await dbPut(key,rec);
+  closeModal();await loadMod(key);
+  if(state.view==='mod'&&state.mod===key)renderModView();
+  toast('已儲存');
+}
+async function delGeneric(){
+  if(!(await askConfirm('確定刪除？')))return;
+  await dbDel(genCtx.key,genCtx.id);closeModal();await loadMod(genCtx.key);
+  if(state.view==='mod')renderModView();
+  toast('已刪除');
+}
+async function genericListView(key){
+  await loadMod(key);
+  const cfg=MODULES[key];
+  const list=(mdata[key]||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.createdAt-a.createdAt);
+  let html='<button class="btn sm" style="margin-bottom:10px" onclick="go(\'more\')">← 返回更多</button>'+
+    '<div class="card" style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">'+cfg.icon+' '+cfg.title+'</h2><span class="mut">共 '+list.length+' 筆</span></div>'+
+    '<button class="btn y" style="margin-bottom:10px" onclick="openGenericForm(\''+key+'\')">＋ 新增'+cfg.title+'</button>';
+  if(key==='materials'&&list.length)html+='<button class="btn sm" style="margin-bottom:10px" onclick="exportCSV(\'materials\')">⬇ 匯出 CSV</button>';
+  if(key==='workers')html+='<button class="btn sm" style="margin-bottom:10px" onclick="go(\'orgchart\')">🌳 工程人員組織架構圖</button>';
+  if(!list.length)html+='<div class="empty"><div class="big">'+cfg.icon+'</div><p>尚無資料</p></div>';
+  html+=list.map(it=>'<div class="rec" style="align-items:flex-start" onclick="openGenericForm(\''+key+'\',\''+it.id+'\')"><div style="width:48px;height:48px;border-radius:10px;background:rgba(127,127,127,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex:none">'+cfg.icon+'</div><div class="rb"><div class="rt">'+cfg.line(it)+'</div><div class="rm">'+cfg.sub(it)+'</div></div></div>').join('');
+  return html;
+}
+
+/* ========== 工程人員組織架構圖（業主／承攬商／下包商／再發包） ========== */
+const ORG_LEVELS=['業主','承攬商','下包商','再發包'];
+const ORG_ICONS=['🏢','👷‍♂️','👷','🔧'];
+const ORG_ROLES=['老闆','管理','監工','施工人員','其他'];
+const ORG_ROLE_COLOR={'老闆':'#dc2626','管理':'#2563eb','監工':'#d97706','施工人員':'#16a34a','其他':'#6b7280'};
+let orgCtx={level:0,parentId:'',id:''};
+let orgZoom=1;
+function orgApplyZoom(){
+  const t=$('orgTree');if(t)t.style.transform='scale('+orgZoom+')';
+  const lbl=$('orgZoomLbl');if(lbl)lbl.textContent=Math.round(orgZoom*100)+'%';
+}
+function orgZoomBtn(delta){
+  orgZoom=Math.min(1.8,Math.max(0.4,+(orgZoom+delta).toFixed(2)));
+  orgApplyZoom();
+}
+function orgZoomReset(){orgZoom=1;orgApplyZoom();}
+function orgBindZoomGesture(){
+  const el=$('orgWrap');if(!el||el.__orgPinchBound)return;
+  el.__orgPinchBound=true;
+  let startDist=0,startZoom=1;
+  el.addEventListener('touchstart',function(e){
+    if(e.touches.length===2){
+      startDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      startZoom=orgZoom;
+    }
+  },{passive:true});
+  el.addEventListener('touchmove',function(e){
+    if(e.touches.length===2&&startDist>0){
+      e.preventDefault();
+      const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      orgZoom=Math.min(1.8,Math.max(0.4,startZoom*(dist/startDist)));
+      orgApplyZoom();
+    }
+  },{passive:false});
+  el.addEventListener('touchend',function(e){if(e.touches.length<2)startDist=0;},{passive:true});
+}
+function orgNodeChildren(all,parentId){return all.filter(n=>(n.parentId||'')===(parentId||''));}
+function orgNodeHTML(n,all){
+  const kids=orgNodeChildren(all,n.id);
+  let html='<li><div class="orgCard lv'+n.level+'"><span class="ic">'+ORG_ICONS[n.level]+'</span>'+
+    '<div class="nm">'+esc(n.name||'（未命名）')+'</div>'+
+    '<div class="mt">'+ORG_LEVELS[n.level]+(n.company?'／'+esc(n.company):'')+'</div>'+
+    (n.phone?'<div class="mt phone">📞 '+esc(n.phone)+'</div>':'<div class="mt">（無電話）</div>')+
+    (n.role?'<span class="rolePill" style="background:'+(ORG_ROLE_COLOR[n.role]||'#6b7280')+'">'+esc(n.role)+'</span>':'')+
+    '<div class="op">'+
+    '<button onclick="openOrgNodeForm('+n.level+',\''+(n.parentId||'')+'\',\''+n.id+'\')" aria-label="編輯">✎</button>'+
+    (n.level<3?'<button onclick="openOrgNodeForm('+(n.level+1)+',\''+n.id+'\')" aria-label="新增下一層">＋</button>':'')+
+    '<button onclick="delOrgNode(\''+n.id+'\')" aria-label="刪除">🗑</button>'+
+    '</div></div>';
+  if(kids.length)html+='<ul>'+kids.map(k=>orgNodeHTML(k,all)).join('')+'</ul>';
+  html+='</li>';
+  return html;
+}
+async function orgChartView(){
+  await loadMod('orgNodes');
+  const all=(mdata.orgNodes||[]).slice();
+  const roots=orgNodeChildren(all,'');
+  let html='<button class="btn sm" style="margin-bottom:10px" onclick="openMod(\'workers\')">← 返回施工人員</button>'+
+    '<div class="card"><h2 style="margin:0 0 4px;font-size:18px">🌳 工程人員組織架構圖</h2><div class="mut" style="font-size:13px">業主 → 承攬商 → 下包商 → 再發包（平行的廠商橫向並排），點｜＋｜可逐層新增，點｜✎｜可編輯</div></div>'+
+    '<div class="orgZoomRow"><button onclick="orgZoomBtn(-0.15)" aria-label="縮小">－</button><span class="zlabel" id="orgZoomLbl">'+Math.round(orgZoom*100)+'%</span><button onclick="orgZoomBtn(0.15)" aria-label="放大">＋</button><button onclick="orgZoomReset()" style="width:auto;padding:0 10px;font-size:13px">重設</button><span class="mut" style="font-size:12px">可用手指縮放或左右滑動</span></div>'+
+    '<div class="orgWrap" id="orgWrap">';
+  if(!roots.length){
+    html+='<div class="orgEmpty">尚未建立組織架構<br>請先新增業主</div><button class="btn y" onclick="openOrgNodeForm(0,\'\')">＋ 新增業主</button>';
+  }else{
+    html+='<div class="tree" id="orgTree" style="transform:scale('+orgZoom+')"><ul>'+roots.map(r=>orgNodeHTML(r,all)).join('')+'</ul></div>';
+  }
+  html+='</div>';
+  if(roots.length)html+='<button class="btn sm" style="margin-top:10px" onclick="openOrgNodeForm(0,\'\')">＋ 新增業主</button>';
+  return html;
+}
+async function openOrgNodeForm(level,parentId,id){
+  const p=curProject();if(!p){toast('請先新增案場');go('more');return;}
+  orgCtx={level:level,parentId:parentId||'',id:id||''};
+  await loadMod('workers');
+  const it=id?(mdata.orgNodes||[]).find(x=>x.id===id):null;
+  const workers=mdata.workers||[];
+  if(!workers.length){
+    modal('<div class="sheet-h"><b>新增'+ORG_LEVELS[level]+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+      '<div class="empty" style="padding:20px 8px"><div class="big">👷</div><p>尚無施工人員資料<br>組織架構圖只能從已輸入的施工人員資料中選擇，<br>請先到「施工人員」新增人員</p></div>'+
+      '<button class="btn dark" onclick="closeModal();openGenericForm(\'workers\')">＋ 前往新增施工人員</button>');
+    return;
+  }
+  modal('<div class="sheet-h"><b>'+(it?'編輯':'新增')+ORG_LEVELS[level]+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<label class="f" style="margin-top:0">從施工人員資料選擇 *</label><select class="in" id="ogWorkerPick" onchange="orgPickWorker()"><option value="">— 請選擇 —</option>'+
+    workers.map(w=>'<option value="'+w.id+'" '+(it&&it.workerId===w.id?'selected':'')+'>'+esc(w.name)+(w.company?'（'+esc(w.company)+'）':'')+'</option>').join('')+'</select>'+
+    '<div id="ogWorkerPreview" class="mut" style="font-size:13px;margin:4px 2px 0"></div>'+
+    '<label class="f">職位</label><select class="in" id="ogRole"><option value="">（未指定）</option>'+
+      ORG_ROLES.map(r=>'<option '+(it&&it.role===r?'selected':'')+'>'+r+'</option>').join('')+'</select>'+
+    '<label class="f">備註</label><textarea class="in" id="ogNote">'+esc(it?it.note||'':'')+'</textarea><div class="gap"></div>'+
+    '<button class="btn dark" onclick="saveOrgNode()">💾 儲存</button>'+
+    (it?'<div class="gap"></div><button class="btn red" onclick="delOrgNode(\''+id+'\',true)">🗑 刪除</button>':''));
+  if(it&&it.workerId){$('ogWorkerPick').value=it.workerId;}
+  orgPickWorker();
+}
+function orgPickWorker(){
+  const wid=$('ogWorkerPick').value;
+  const prev=$('ogWorkerPreview');
+  if(!wid){prev.textContent='';return;}
+  const w=(mdata.workers||[]).find(x=>x.id===wid);
+  if(!w){prev.textContent='';return;}
+  prev.textContent=(w.company?w.company+'　':'')+(w.phone?'📞'+w.phone:'');
+}
+async function saveOrgNode(){
+  const wid=$('ogWorkerPick').value;
+  if(!wid){toast('請從施工人員資料中選擇一位人員');return;}
+  const w=(mdata.workers||[]).find(x=>x.id===wid);
+  if(!w){toast('找不到該施工人員資料');return;}
+  const p=curProject();
+  let rec=orgCtx.id?(mdata.orgNodes||[]).find(x=>x.id===orgCtx.id):{id:uid(),projectId:p.id,level:orgCtx.level,parentId:orgCtx.parentId,createdAt:Date.now()};
+  rec.workerId=wid;rec.name=w.name||'';rec.company=w.company||'';rec.phone=w.phone||'';
+  rec.note=$('ogNote').value.trim();rec.role=$('ogRole').value;
+  await dbPut('orgNodes',rec);closeModal();await loadMod('orgNodes');
+  if(state.view==='orgchart')renderOrgChartPage();
+  toast('已儲存');
+}
+async function delOrgNode(id,fromModal){
+  if(!(await askConfirm('刪除後其下所有下層人員／廠商也會一併刪除，確定刪除？')))return;
+  const all=(mdata.orgNodes||[]).slice();
+  const toDel=[id];
+  for(let i=0;i<toDel.length;i++){orgNodeChildren(all,toDel[i]).forEach(k=>toDel.push(k.id));}
+  for(const did of toDel){await dbDel('orgNodes',did);}
+  if(fromModal)closeModal();
+  await loadMod('orgNodes');
+  if(state.view==='orgchart')renderOrgChartPage();
+  toast('已刪除');
+}
+function exportCSV(key){
+  const list=mdata[key]||[];
+  if(!list.length){toast('沒有資料可匯出');return;}
+  let blob,name;
+  if(key==='materials'){
+    blob=toCSV(list,[{key:'date',label:'日期'},{key:'category',label:'分類'},{key:'name',label:'品項／說明'},{key:'pettyType',label:'零用金類型'},{key:'qty',label:'數量'},{key:'unit',label:'單位'},{key:'price',label:'單價'},{key:'amount',label:'金額',get:r=>materialAmount(r)},{key:'vendor',label:'廠商'},{key:'note',label:'備註'}]);
+    name='工程材料發包零用金_'+fmtD(Date.now())+'.csv';
+  }else if(key==='records'){
+    blob=toCSV(list,[{key:'createdAt',label:'日期時間',get:r=>fmt(r.createdAt)},{key:'title',label:'工項/缺失'},{key:'status',label:'狀態',get:r=>ST[r.status].n},{key:'location',label:'位置'},{key:'desc',label:'說明'}]);
+    name='施工日誌_'+fmtD(Date.now())+'.csv';
+  }else return;
+  saveBlob(blob,name);
+}
+
+/* ========== 工程財務總覽（承攬金額 / 材料成本 / 利潤 / 花費佔比） ========== */
+const DEFAULT_DEDUCTIONS=[
+  {name:'勞工安全衛生及清運費',pct:1.5},
+  {name:'品質管理費',pct:0.8},
+  {name:'工程保險',pct:0.3}
+];
+function materialAmount(it){return it.category==='零用金'?(parseFloat(it.amount)||0):(parseFloat(it.qty)||0)*(parseFloat(it.price)||0);}
+function matCostTotal(){return (mdata.materials||[]).reduce((s,it)=>s+materialAmount(it),0);}
+function money(n){return 'NT$ '+Math.round(n||0).toLocaleString();}
+function romanBasic(n){
+  const map=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+  let res='';for(const pair of map){while(n>=pair[0]){res+=pair[1];n-=pair[0];}}
+  return res;
+}
+function overline(s){return s.split('').map(c=>c+'̅').join('');}
+function toRoman(num){
+  num=Math.round(num||0);if(num<=0)return '';
+  const millions=Math.floor(num/1000000);
+  const rem=num%1000000;
+  const thousands=Math.floor(rem/1000);
+  const units=rem%1000;
+  let res='';
+  if(millions>0)res+=overline(overline(romanBasic(millions)))+' ';
+  if(thousands>0)res+=overline(romanBasic(thousands))+' ';
+  res+=romanBasic(units)||(res?'':'N');
+  return res.trim();
+}
+function cnFour(num){
+  const CN=['零','壹','貳','參','肆','伍','陸','柒','捌','玖'],UNIT=['','拾','佰','仟'];
+  const d=String(num).padStart(4,'0').split('').map(Number);
+  let s='',zero=false,started=false;
+  for(let i=0;i<4;i++){
+    if(d[i]===0){if(started)zero=true;}
+    else{if(zero){s+=CN[0];zero=false;}s+=CN[d[i]]+UNIT[3-i];started=true;}
+  }
+  return s;
+}
+function toChineseCapital(n){
+  n=Math.round(n||0);
+  if(n<=0)return '零元整';
+  const BIG=['','萬','億','兆'];
+  let parts=[],x=n;
+  while(x>0){parts.unshift(x%10000);x=Math.floor(x/10000);}
+  let s='';
+  for(let i=0;i<parts.length;i++){
+    const seg=parts[i],pos=parts.length-1-i;
+    if(seg===0){if(s&&!s.endsWith('零'))s+='零';continue;}
+    const segStr=cnFour(seg);
+    s+=(s.endsWith('零')||!s?'':(seg<1000&&i>0?'零':''))+segStr+BIG[pos];
+  }
+  s=s.replace(/零+/g,'零').replace(/零$/,'').replace(/零(萬|億|兆)/g,'$1');
+  return s+'元整';
+}
+function pct1(n){return (Math.round((n||0)*10)/10).toString().replace(/\.0$/,'');}
+const CAT_COLORS={'發包工程':'#f59e0b','發包設備':'#3b82f6','發包材料':'#10b981','零用金':'#ef4444','其他':'#8b5cf6'};
+function pieChartHTML(parts){
+  // parts: [{name,amt,color}] 已排除 0 元
+  const total=parts.reduce((s,p)=>s+p.amt,0);
+  if(!total)return '<div class="empty" style="padding:20px">尚無支出資料，圓餅圖將於新增材料／發包／零用金後顯示</div>';
+  let acc=0;
+  const stops=parts.map(p=>{
+    const from=acc/total*100;acc+=p.amt;const to=acc/total*100;
+    return p.color+' '+from.toFixed(2)+'% '+to.toFixed(2)+'%';
+  }).join(',');
+  const legend=parts.map(p=>'<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><span style="width:14px;height:14px;border-radius:4px;background:'+p.color+';flex:none"></span><span style="flex:1">'+esc(p.name)+'</span><b>'+pct1(p.amt/total*100)+'%</b><span class="mut" style="width:90px;text-align:right">'+money(p.amt)+'</span></div>').join('');
+  return '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><div style="width:140px;height:140px;border-radius:50%;background:conic-gradient('+stops+');flex:none"></div><div style="flex:1;min-width:160px">'+legend+'</div></div>';
+}
+function financeSummaryHTML(){
+  const p=curProject(),contract=parseFloat(p.finalContract)||0;
+  const dedList=(p.deductions&&p.deductions.length)?p.deductions:DEFAULT_DEDUCTIONS;
+  const dedSum=dedList.reduce((s,d)=>s+contract*(parseFloat(d.pct)||0)/100,0);
+  const net=contract-dedSum;
+  const catTotals=MAT_CATS.map(c=>({name:c,amt:(mdata.materials||[]).filter(x=>x.category===c).reduce((s,x)=>s+materialAmount(x),0),color:CAT_COLORS[c]})).filter(x=>x.amt>0);
+  const matCost=catTotals.reduce((s,x)=>s+x.amt,0);
+  const profit=net-matCost;
+  const profitPct=contract?profit/contract*100:0;
+  return '<div class="card"><h2 style="margin:0 0 10px">💰 工程財務總覽</h2>'+
+    (contract?'':'<div class="mut" style="margin-bottom:8px">尚未設定承攬金額，請到「案場管理」編輯此案場填寫。</div>')+
+    '<div class="kv"><b>承攬金額(未稅)</b>'+money(contract)+'</div>'+
+    (dedList.length?'<div class="mut" style="font-size:13px;margin:4px 0 2px">扣除項目：</div>'+dedList.map(d=>'<div class="kv" style="margin:2px 0;font-size:14px"><b style="width:auto">'+esc(d.name)+' '+d.pct+'%</b>'+money(contract*(parseFloat(d.pct)||0)/100)+'</div>').join(''):'')+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">'+
+    '<div class="stat" style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;text-align:left"><span class="mut">淨承攬金額</span><b style="font-size:19px">'+money(net)+'</b></div>'+
+    '<div class="stat" style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;text-align:left"><span class="mut">支出成本</span><b style="font-size:19px;color:#16a34a">-'+money(matCost)+'</b></div>'+
+    '<div class="stat red" style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;text-align:left"><span class="mut">預估最終利潤</span><b style="font-size:19px">'+money(profit)+'</b></div>'+
+    '</div>'+
+    '<div class="stat" style="margin-top:8px;background:rgba(127,127,127,.12)"><b style="font-size:26px">'+pct1(profitPct)+'%</b><span>利潤率（利潤 ÷ 承攬金額）</span></div>'+
+    '<button class="btn sm" style="margin-top:10px" onclick="openProjectForm(\''+p.id+'\')">✏️ 編輯承攬金額／扣除項目</button>'+
+    '<div class="pfloor" style="margin-top:16px">📊 總花費佔比</div>'+pieChartHTML(catTotals)+
+    (p.status==='done'?
+      '<button class="btn" style="margin-top:14px;background:#6b7280;color:#fff" onclick="openCloseoutMenu()">📄 已結案（'+(p.completedAt?fmtD(p.completedAt):'—')+'）・產生結案報表</button>'+
+      '<button class="btn sm" style="margin-top:8px" onclick="revertProjectDone()">↩️ 誤觸了？恢復為進行中</button>'
+      :'<button class="btn y" style="margin-top:14px" onclick="markProjectDone()">✅ 案場結案</button>')+
+    '</div>';
+}
+/* ========== 結案報表 ========== */
+function projDurationDays(p){
+  const start=p.startDate?new Date(p.startDate+'T00:00:00').getTime():(p.createdAt||Date.now());
+  const end=p.completedAt||Date.now();
+  return Math.max(1,Math.round((end-start)/86400000)+1);
+}
+function playChaChing(){
+  try{
+    const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
+    const ctx=new Ctx(),now=ctx.currentTime;
+    function tone(freq,start,dur,type,gain){
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type=type||'sine';o.frequency.value=freq;
+      g.gain.setValueAtTime(0,now+start);
+      g.gain.linearRampToValueAtTime(gain||0.3,now+start+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,now+start+dur);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(now+start);o.stop(now+start+dur+0.05);
+    }
+    tone(1568,0,0.15,'sine',0.25);
+    tone(1976,0.02,0.18,'sine',0.2);
+    tone(2093,0.15,0.35,'sine',0.28);
+    tone(2637,0.17,0.3,'sine',0.18);
+    tone(3136,0.19,0.25,'sine',0.12);
+    for(let i=0;i<4;i++)tone(1800+Math.random()*800,0.4+i*0.05,0.08,'triangle',0.1);
+    setTimeout(()=>ctx.close(),1200);
+  }catch(e){}
+}
+async function markProjectDone(){
+  const p=curProject();if(!p)return;
+  if(!(await askConfirm('確定要將「'+p.name+'」標記為已完成結案嗎？','確定結案')))return;
+  p.status='done';if(!p.completedAt)p.completedAt=Date.now();
+  await dbPut('projects',p);
+  await loadProjects();render();
+  playChaChing();
+  toast('已標記結案 💰');
+  openCloseoutMenu();
+}
+async function revertProjectDone(){
+  const p=curProject();if(!p)return;
+  if(!(await askConfirm('確定要將「'+p.name+'」恢復為進行中嗎？','恢復為進行中')))return;
+  p.status='active';
+  await dbPut('projects',p);
+  await loadProjects();render();
+  toast('已恢復為進行中');
+}
+function openCloseoutMenu(){
+  const p=curProject();if(!p)return;
+  modal('<div class="sheet-h"><b>結案報表</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<div class="mut" style="margin-bottom:10px">「'+esc(p.name)+'」是否要產生結案報表？</div>'+
+    '<button class="btn y" style="margin-bottom:8px" onclick="closeModal();generateCloseoutImage()">🖼 產生簡易報表圖片</button>'+
+    '<button class="btn" style="margin-bottom:8px" onclick="closeModal();exportCloseoutCSV()">⬇ 匯出結案報表 CSV</button>'+
+    '<button class="btn" onclick="closeModal()">不用了</button>');
+}
+function ctxEllipsis(ctx,text,maxW){
+  text=String(text==null?'':text);
+  if(ctx.measureText(text).width<=maxW)return text;
+  while(text.length>1&&ctx.measureText(text+'…').width>maxW)text=text.slice(0,-1);
+  return text+'…';
+}
+function closeoutImageBlob(p){
+  const contract=parseFloat(p.finalContract)||0;
+  const dedList=(p.deductions&&p.deductions.length)?p.deductions:DEFAULT_DEDUCTIONS;
+  const dedSum=dedList.reduce((s,d)=>s+contract*(parseFloat(d.pct)||0)/100,0);
+  const net=contract-dedSum;
+  const catTotals=MAT_CATS.map(c=>({name:c,amt:(mdata.materials||[]).filter(x=>x.category===c).reduce((s,x)=>s+materialAmount(x),0),color:CAT_COLORS[c]})).filter(x=>x.amt>0);
+  const matCost=catTotals.reduce((s,x)=>s+x.amt,0);
+  const profit=net-matCost;
+  const profitPct=contract?profit/contract*100:0;
+  const days=projDurationDays(p);
+  const startShow=p.startDate||fmtD(p.createdAt);
+  const endShow=p.completedAt?fmtD(p.completedAt):fmtD(Date.now());
+
+  const ops=[{t:'header',name:p.name,client:p.client,loc:p.location}];
+  ops.push({t:'kv',label:'開工日期',value:startShow});
+  ops.push({t:'kv',label:'結案日期',value:endShow});
+  ops.push({t:'kv',label:'工程花費時間',value:days+' 天'});
+  ops.push({t:'gap',h:10});
+  ops.push({t:'section',title:'💰 財務總結'});
+  ops.push({t:'kv',label:'承攬金額(未稅)',value:money(contract)});
+  dedList.forEach(d=>ops.push({t:'kv',label:'扣除：'+d.name+'（'+d.pct+'%）',value:'-'+money(contract*(parseFloat(d.pct)||0)/100),sub:true}));
+  ops.push({t:'kv',label:'淨承攬金額',value:money(net)});
+  ops.push({t:'kv',label:'支出成本',value:'-'+money(matCost)});
+  ops.push({t:'kvbig',label:'最終利潤',value:money(profit),color:profit>=0?'#16a34a':'#dc2626'});
+  ops.push({t:'kvbig',label:'利潤率（利潤÷承攬金額）',value:pct1(profitPct)+'%',color:'#111827'});
+  ops.push({t:'gap',h:10});
+  ops.push({t:'section',title:'📊 各分類花費佔比'});
+  if(catTotals.length)catTotals.forEach(c=>ops.push({t:'bar',name:c.name,amt:c.amt,pct:matCost?c.amt/matCost*100:0,color:c.color}));
+  else ops.push({t:'kv',label:'尚無支出資料',value:''});
+  ops.push({t:'gap',h:8});
+  ops.push({t:'footer',text:'製表日期：'+fmtD(Date.now())});
+
+  const H_OF={header:138,kv:36,kvbig:52,section:38,bar:52,footer:32};
+  const heightOf=op=>op.t==='gap'?op.h:H_OF[op.t];
+  const W=720,PAD=32;
+  let totalH=8;
+  ops.forEach(op=>{totalH+=heightOf(op);});
+  totalH+=16;
+
+  const cv=document.createElement('canvas'),scale=2;
+  cv.width=W*scale;cv.height=totalH*scale;
+  const ctx=cv.getContext('2d');ctx.scale(scale,scale);
+  ctx.fillStyle='#eef0f3';ctx.fillRect(0,0,W,totalH);
+
+  let y=0;
+  ops.forEach(op=>{
+    const h=heightOf(op);
+    if(op.t==='header'){
+      ctx.fillStyle='#111827';ctx.fillRect(0,0,W,h);
+      ctx.fillStyle='#ffc400';ctx.font='700 13px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';
+      ctx.fillText('簡易報表',PAD,32);
+      ctx.fillStyle='#fff';ctx.font='900 25px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';
+      ctx.fillText(ctxEllipsis(ctx,op.name||'',W-PAD*2),PAD,68);
+      ctx.font='400 14px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='#cbd5e1';
+      ctx.fillText('業主／主包：'+ctxEllipsis(ctx,op.client||'—',(W-PAD*2)/2-6),PAD,94);
+      ctx.fillText('施作地址：'+ctxEllipsis(ctx,op.loc||'—',W-PAD*2),PAD,116);
+    }else if(op.t==='section'){
+      y+=8;
+      ctx.fillStyle='#111827';ctx.font='700 15px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';
+      ctx.textAlign='left';ctx.fillText(op.title,PAD,y+20);
+      ctx.strokeStyle='#d7dbe2';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(PAD,y+30);ctx.lineTo(W-PAD,y+30);ctx.stroke();
+      y-=8;
+    }else if(op.t==='kv'){
+      ctx.font=(op.sub?'400 13px':'400 15px')+' -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';
+      ctx.fillStyle=op.sub?'#9aa2af':'#6b7280';ctx.textAlign='left';
+      ctx.fillText(ctxEllipsis(ctx,op.label,W*0.55),PAD+(op.sub?10:0),y+24);
+      ctx.font=(op.sub?'700 13px':'700 15px')+' -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';
+      ctx.fillStyle='#111827';ctx.textAlign='right';
+      ctx.fillText(op.value,W-PAD,y+24);
+      ctx.textAlign='left';
+    }else if(op.t==='kvbig'){
+      ctx.fillStyle='rgba(127,127,127,.12)';ctx.fillRect(PAD-10,y+6,W-PAD*2+20,h-12);
+      ctx.font='700 14px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='#6b7280';ctx.textAlign='left';
+      ctx.fillText(op.label,PAD,y+32);
+      ctx.font='900 22px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';ctx.fillStyle=op.color||'#111827';ctx.textAlign='right';
+      ctx.fillText(op.value,W-PAD,y+34);
+      ctx.textAlign='left';
+    }else if(op.t==='bar'){
+      const bw=W-PAD*2;
+      ctx.font='700 14px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='#111827';ctx.textAlign='left';
+      ctx.fillText(op.name,PAD,y+18);
+      ctx.textAlign='right';ctx.font='400 13px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='#6b7280';
+      ctx.fillText(money(op.amt)+'　'+pct1(op.pct)+'%',W-PAD,y+18);
+      ctx.textAlign='left';
+      ctx.fillStyle='#e2e5ea';ctx.beginPath();ctx.roundRect?ctx.roundRect(PAD,y+26,bw,10,5):ctx.rect(PAD,y+26,bw,10);ctx.fill();
+      ctx.fillStyle=op.color||'#3b82f6';
+      const fw=Math.max(4,bw*Math.min(1,op.pct/100));
+      ctx.beginPath();ctx.roundRect?ctx.roundRect(PAD,y+26,fw,10,5):ctx.rect(PAD,y+26,fw,10);ctx.fill();
+    }else if(op.t==='footer'){
+      ctx.font='400 12px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='#9aa2af';ctx.textAlign='center';
+      ctx.fillText(op.text,W/2,y+20);
+      ctx.textAlign='left';
+    }
+    y+=h;
+  });
+
+  return new Promise(resolve=>cv.toBlob(resolve,'image/png'));
+}
+async function generateCloseoutImage(){
+  await loadMod('materials');
+  const p=curProject();if(!p){toast('尚無案場');return;}
+  busy(true,'產生報表圖片…');
+  try{
+    const blob=await closeoutImageBlob(p);
+    if(!blob){toast('產生圖片失敗');return;}
+    await saveBlob(blob,'簡易報表_'+p.name.replace(/[\\/:*?"<>|]/g,'')+'_'+fmtD(Date.now()).replace(/-/g,'')+'.png');
+  }catch(e){alert('產生圖片失敗：'+(e&&e.message||e));}
+  finally{busy(false);}
+}
+async function exportCloseoutCSV(){
+  await loadMod('materials');
+  const p=curProject();
+  const contract=parseFloat(p.finalContract)||0;
+  const dedList=(p.deductions&&p.deductions.length)?p.deductions:DEFAULT_DEDUCTIONS;
+  const dedSum=dedList.reduce((s,d)=>s+contract*(parseFloat(d.pct)||0)/100,0);
+  const net=contract-dedSum;
+  const matCost=matCostTotal();
+  const profit=net-matCost;
+  const profitPct=contract?profit/contract*100:0;
+  const days=projDurationDays(p);
+  const q=v=>{v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const lines=[];
+  const row=(...a)=>lines.push(a.map(q).join(','));
+  row('工程結案報表',p.name);
+  row('業主／主包',p.client||'');
+  row('施作地址',p.location||'');
+  row('開工日期',p.startDate||fmtD(p.createdAt));
+  row('結案日期',p.completedAt?fmtD(p.completedAt):fmtD(Date.now()));
+  row('工程花費時間(天)',days);
+  row('承攬金額(未稅)',contract);
+  dedList.forEach(d=>row('扣除-'+d.name+'('+d.pct+'%)',-(contract*(parseFloat(d.pct)||0)/100)));
+  row('淨承攬金額',net);
+  row('支出成本合計',-matCost);
+  row('最終利潤',profit);
+  row('利潤率(%)',pct1(profitPct));
+  row('');
+  row('日期','分類','項目/說明','廠商','數量','單位','單價','金額');
+  (mdata.materials||[]).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(it=>{
+    const amt=materialAmount(it),isPetty=it.category==='零用金';
+    row(it.date||'',it.category||'',isPetty?((it.pettyType||'零用金')+'｜'+(it.name||'')):(it.name||''),
+      isPetty?'':(it.vendor||''), isPetty?'':(it.qty||''), isPetty?'':(it.unit||''),
+      isPetty?'':(it.price||''), amt);
+  });
+  const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  await saveBlob(blob,'結案報表_'+p.name.replace(/[\\/:*?"<>|]/g,'')+'_'+fmtD(Date.now()).replace(/-/g,'')+'.csv');
+}
+
+/* ========== 工程材料／發包／零用金 ========== */
+const MAT_CATS=['發包工程','發包設備','發包材料','零用金','其他'];
+const MAT_CAT_ICON={'發包工程':'👷','發包設備':'🛠️','發包材料':'📦','零用金':'💵','其他':'🗂️'};
+function matCatIcon(cat){return MAT_CAT_ICON[cat]||'📦';}
+const PETTY_TYPES=['餐飲','住宿','油資','五金材料','其他'];
+let matFilter='all',_pettyMonth=todayStr().slice(0,7);
+function matToggleCat(){
+  const cat=$('mCat').value;
+  $('mNormalBox').style.display=cat==='零用金'?'none':'block';
+  $('mPettyBox').style.display=cat==='零用金'?'block':'none';
+  if(cat==='發包工程'){
+    const q=$('mQty'),u=$('mUnit');
+    if(q&&!q.value.trim())q.value='1';
+    if(u&&!u.value.trim())u.value='式';
+  }
+}
+function matVendorList(){
+  return (mdata.vendors||[]).slice().sort((a,b)=>(a.name||'').localeCompare(b.name||'','zh-Hant'));
+}
+let vendorEditId='';
+async function openVendorPicker(){
+  await loadMod('vendors');
+  let wrap=document.getElementById('vendorPickOv');
+  if(!wrap){
+    wrap=document.createElement('div');
+    wrap.id='vendorPickOv';
+    wrap.className='cfOv';
+    document.body.appendChild(wrap);
+    wrap.addEventListener('click',e=>{if(e.target===wrap)closeVendorPicker();});
+  }
+  renderVendorPickerList();
+}
+function closeVendorPicker(){const wrap=document.getElementById('vendorPickOv');if(wrap)wrap.remove();}
+function renderVendorPickerList(){
+  const wrap=document.getElementById('vendorPickOv');if(!wrap)return;
+  const vendors=matVendorList();
+  wrap.innerHTML='<div class="cfBox" style="max-width:380px;max-height:76vh;overflow-y:auto;text-align:left">'+
+    '<div class="sheet-h" style="margin-bottom:8px"><b>選擇廠商</b><button class="x" type="button" onclick="closeVendorPicker()">✕</button></div>'+
+    '<button type="button" class="btn y sm" style="margin-bottom:10px;width:100%" onclick="openVendorForm()">＋ 新增廠商</button>'+
+    (vendors.length?vendors.map(v=>'<div class="rec" style="align-items:center;padding:8px 10px;cursor:pointer">'+
+      '<div style="flex:1;min-width:0" onclick="pickVendor(\''+v.id+'\')"><div class="rt">'+esc(v.name)+'</div>'+
+      (v.contact||v.phone?'<div class="rm">'+esc(v.contact||'')+(v.phone?'　📞'+esc(v.phone):'')+'</div>':'')+'</div>'+
+      '<div style="display:flex;gap:6px;flex:none">'+
+      '<button type="button" class="x" style="width:34px;height:34px;font-size:14px" onclick="event.stopPropagation();openVendorForm(\''+v.id+'\')" aria-label="編輯">✎</button>'+
+      '<button type="button" class="x" style="width:34px;height:34px;font-size:14px" onclick="event.stopPropagation();delVendor(\''+v.id+'\')" aria-label="刪除">🗑</button>'+
+      '</div></div>').join(''):'<div class="empty" style="padding:20px 8px"><div class="big">🏗</div><p>尚無廠商資料<br>點上方「＋ 新增廠商」開始建立</p></div>');
+}
+function pickVendor(id){
+  const v=(mdata.vendors||[]).find(x=>x.id===id);
+  const el=$('mVendor');
+  if(v&&el)el.value=v.name;
+  closeVendorPicker();
+}
+function openVendorForm(id){
+  vendorEditId=id||'';
+  const it=id?(mdata.vendors||[]).find(x=>x.id===id):null;
+  const wrap=document.getElementById('vendorPickOv');if(!wrap)return;
+  wrap.innerHTML='<div class="cfBox" style="max-width:380px;max-height:76vh;overflow-y:auto;text-align:left">'+
+    '<div class="sheet-h" style="margin-bottom:8px"><b>'+(it?'編輯廠商':'新增廠商')+'</b><button class="x" type="button" onclick="renderVendorPickerList()">✕</button></div>'+
+    '<label class="f" style="margin-top:0">廠商名稱 *</label><input class="in" id="vName" value="'+esc(it?it.name:'')+'">'+
+    '<label class="f">聯絡人</label><input class="in" id="vContact" value="'+esc(it?it.contact||'':'')+'">'+
+    '<label class="f">聯絡電話</label><input class="in" id="vPhone" value="'+esc(it?it.phone||'':'')+'">'+
+    '<label class="f">備註</label><textarea class="in" id="vNote">'+esc(it?it.note||'':'')+'</textarea><div class="gap"></div>'+
+    '<button class="btn dark" type="button" onclick="saveVendorInline()">💾 儲存</button>'+
+    (it?'<div class="gap"></div><button class="btn red" type="button" onclick="delVendor(\''+id+'\')">🗑 刪除</button>':'');
+}
+async function saveVendorInline(){
+  const nameEl=$('vName');if(!nameEl)return;
+  const name=nameEl.value.trim();
+  if(!name){toast('請輸入廠商名稱');return;}
+  const p=curProject();if(!p)return;
+  let rec=vendorEditId?(mdata.vendors||[]).find(x=>x.id===vendorEditId):{id:uid(),projectId:p.id,createdAt:Date.now()};
+  rec.name=name;rec.contact=$('vContact').value.trim();rec.phone=$('vPhone').value.trim();rec.note=$('vNote').value.trim();
+  await dbPut('vendors',rec);await loadMod('vendors');
+  renderVendorPickerList();
+  toast('已儲存');
+}
+async function delVendor(id){
+  if(!(await askConfirm('確定刪除此廠商資料？（已填在其他紀錄裡的廠商文字不受影響）')))return;
+  await dbDel('vendors',id);await loadMod('vendors');
+  renderVendorPickerList();
+  toast('已刪除');
+}
+async function openMaterialForm(id){
+  const p=curProject();if(!p){toast('請先新增案場');go('more');return;}
+  await loadMod('materials');await loadMod('vendors');
+  const it=id?(mdata.materials||[]).find(x=>x.id===id):null;
+  const cat=it?it.category:'發包材料';
+  genCtx={key:'materials',id:id||''};
+  const vendors=matVendorList();
+  modal('<div class="sheet-h"><b>'+(it?'編輯':'新增')+'工程材料／發包／零用金</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<label class="f" style="margin-top:0">日期 *</label><input class="in" type="date" id="mDate" value="'+(it?it.date:todayStr())+'">'+
+    '<label class="f">分類</label><select class="in" id="mCat" onchange="matToggleCat()">'+MAT_CATS.map(c=>'<option '+(cat===c?'selected':'')+'>'+c+'</option>').join('')+'</select>'+
+    '<div id="mNormalBox" style="display:'+(cat==='零用金'?'none':'block')+'">'+
+      '<label class="f">品項名稱</label><input class="in" id="mName" value="'+esc(it?it.name:'')+'" placeholder="例如：模板工程 / 磁磚 / 電線">'+
+      '<div class="two"><div><label class="f">數量</label><input class="in" type="number" id="mQty" value="'+(it&&it.category!=='零用金'?(it.qty||''):'')+'"></div><div><label class="f">單位</label><input class="in" id="mUnit" value="'+esc(it&&it.category!=='零用金'?(it.unit||''):'')+'"></div></div>'+
+      '<label class="f">單價(NT$)</label><input class="in" type="number" id="mPrice" value="'+(it&&it.category!=='零用金'?(it.price||''):'')+'">'+
+      '<label class="f">廠商</label>'+
+      '<button type="button" class="pickbtn" id="mVendorPickBtn" onclick="openVendorPicker()" style="margin-bottom:8px"><span class="ptxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(vendors.length?'選擇廠商（'+vendors.length+'）／管理':'尚無廠商資料，點此新增')+'</span><span>▾</span></button>'+
+      '<input class="in" id="mVendor" value="'+esc(it?it.vendor:'')+'" list="mVendorDL" placeholder="輸入或從上方選擇廠商名稱" autocomplete="off">'+
+      '<datalist id="mVendorDL">'+vendors.map(v=>'<option value="'+esc(v.name)+'">').join('')+'</datalist>'+
+    '</div>'+
+    '<div id="mPettyBox" style="display:'+(cat==='零用金'?'block':'none')+'">'+
+      '<label class="f">支出類型</label><select class="in" id="mPettyType">'+PETTY_TYPES.map(t=>'<option '+(it&&it.pettyType===t?'selected':'')+'>'+t+'</option>').join('')+'</select>'+
+      '<label class="f">用途說明</label><input class="in" id="mDesc" value="'+esc(it&&it.category==='零用金'?(it.name||''):'')+'" placeholder="例如：現場人員午餐、加油站加油">'+
+      '<label class="f">金額(NT$) *</label><input class="in" type="number" id="mAmount" value="'+(it&&it.category==='零用金'?(it.amount||''):'')+'">'+
+      '<label class="switchrow" style="margin-top:10px"><span>💳 本人代墊</span><input type="checkbox" id="mAdvanced" style="width:26px;height:26px" '+(it&&it.advanced?'checked':'')+'></label>'+
+      '<div class="mut" style="font-size:12px">勾選「本人代墊」才會列入「零用金月請款清單」，方便每月跟公司請款；未勾選僅記帳用。</div>'+
+    '</div>'+
+    '<label class="f">備註</label><textarea class="in" id="mNote">'+esc(it?it.note:'')+'</textarea><div class="gap"></div>'+
+    '<button class="btn dark" onclick="saveMaterial()">💾 儲存</button>'+
+    (it?'<div class="gap"></div><button class="btn red" onclick="delMaterial()">🗑 刪除</button>':''));
+}
+async function saveMaterial(){
+  const cat=$('mCat').value,date=$('mDate').value;
+  if(!date){toast('請選擇日期');return;}
+  const p=curProject();
+  let rec=genCtx.id?(mdata.materials||[]).find(x=>x.id===genCtx.id):{id:uid(),projectId:p.id,createdAt:Date.now()};
+  if(cat==='零用金'){
+    const amt=parseFloat($('mAmount').value)||0;
+    if(!amt){toast('請輸入金額');return;}
+    Object.assign(rec,{category:cat,date:date,pettyType:$('mPettyType').value,name:$('mDesc').value.trim()||$('mPettyType').value,amount:amt,advanced:!!$('mAdvanced').checked,qty:'',unit:'',price:'',vendor:'',note:$('mNote').value.trim()});
+  }else{
+    const name=$('mName').value.trim();
+    if(!name){toast('請輸入品項名稱');return;}
+    const vendorName=$('mVendor').value.trim();
+    Object.assign(rec,{category:cat,date:date,name:name,qty:$('mQty').value,unit:$('mUnit').value.trim(),price:$('mPrice').value,vendor:vendorName,amount:'',pettyType:'',advanced:false,note:$('mNote').value.trim()});
+    if(vendorName)await ensureVendor(vendorName);
+  }
+  await dbPut('materials',rec);closeModal();await loadMod('materials');
+  if(state.view==='mod'&&state.mod==='materials')renderModView();
+  toast('已儲存');
+}
+async function ensureVendor(name){
+  await loadMod('vendors');
+  const exists=(mdata.vendors||[]).some(v=>(v.name||'').trim()===name);
+  if(exists)return;
+  const p=curProject();if(!p)return;
+  await dbPut('vendors',{id:uid(),projectId:p.id,name:name,contact:'',phone:'',note:'',createdAt:Date.now()});
+  await loadMod('vendors');
+}
+async function delMaterial(){
+  if(!(await askConfirm('確定刪除？')))return;
+  await dbDel('materials',genCtx.id);closeModal();await loadMod('materials');
+  if(state.view==='mod')renderModView();toast('已刪除');
+}
+function curPettyMonth(){const el=$('pettyMonth');return el?el.value:_pettyMonth;}
+function pettyClaimList(ym){return (mdata.materials||[]).filter(x=>x.category==='零用金'&&!!x.advanced&&(x.date||'').startsWith(ym)).sort((a,b)=>(a.date||'').localeCompare(b.date||''));}
+function matPettyMonthChange(v){_pettyMonth=v;renderModView();}
+function modProjectSwitcherHTML(){
+  if(!projects.length)return '';
+  const p=curProject()||projects[0];
+  return '<div class="card" style="padding:12px 14px"><label class="f" style="margin-top:0;margin-bottom:6px">📍 目前案場</label>'+
+    '<button class="pickbtn" onclick="openProjectPicker()"><span class="ptxt" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(projectYearName(p))+'</span>'+statusPill(p.status)+'</button></div>';
+}
+async function materialListView(){
+  await loadMod('materials');
+  const list=(mdata.materials||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.createdAt-a.createdAt);
+  const byCat=c=>list.filter(x=>x.category===c);
+  const sumCat=c=>byCat(c).reduce((s,x)=>s+materialAmount(x),0);
+  const bundleCost=sumCat('發包工程')+sumCat('發包設備')+sumCat('發包材料');
+  const pettyCost=sumCat('零用金');
+  const shown=matFilter==='all'?list:list.filter(x=>x.category===matFilter);
+  const ym=_pettyMonth;
+  let html='<button class="btn sm" style="margin-bottom:10px" onclick="go(\'more\')">← 返回更多</button>'+
+    modProjectSwitcherHTML()+
+    '<div class="card"><h2 style="margin:0 0 8px">📦 工程材料／發包／零用金</h2><div class="stats">'+
+    '<div class="stat"><b>'+money(bundleCost)+'</b><span>發包成本合計</span></div>'+
+    '<div class="stat"><b>'+money(pettyCost)+'</b><span>零用金支出</span></div>'+
+    '<div class="stat red"><b>'+money(bundleCost+pettyCost)+'</b><span>總支出</span></div></div></div>'+
+    '<button class="btn y" style="margin-bottom:10px" onclick="openMaterialForm()">＋ 新增紀錄</button>'+
+    '<div class="chips">'+['all'].concat(MAT_CATS).map(c=>'<button class="chip '+(matFilter===c?'on':'')+'" onclick="matFilter=\''+c+'\';renderModView()">'+(c==='all'?'全部 '+list.length:c+' '+byCat(c).length)+'</button>').join('')+'</div>';
+  if(shown.length)html+='<button class="btn sm" style="margin-bottom:10px" onclick="exportCSV(\'materials\')">⬇ 匯出全部 CSV</button>';
+  html+='<button class="btn sm" style="margin-bottom:10px" onclick="go(\'vendorRank\')">🏆 廠商金額排行</button>';
+  if(!shown.length)html+='<div class="empty"><div class="big">📦</div><p>尚無資料</p></div>';
+  html+=shown.map(it=>{
+    const amt=materialAmount(it);
+    const label=it.category==='零用金'?esc(it.pettyType||'零用金')+'｜'+esc(it.name||''):esc(it.name||'');
+    const advTag=it.category==='零用金'?(it.advanced?'<span class="badge" style="background:#0f766e">💳 代墊待請款</span>':'<span class="badge" style="background:#6b7280">未代墊</span>'):'';
+    return '<div class="rec" onclick="openMaterialForm(\''+it.id+'\')"><div style="width:48px;height:48px;border-radius:10px;background:rgba(127,127,127,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex:none">'+matCatIcon(it.category)+'</div><div class="rb"><div class="rt">'+label+'</div><div class="rm">'+esc(it.category||'')+'　'+it.date+(it.vendor?'　'+esc(it.vendor):'')+'</div>'+(advTag?'<div class="rm">'+advTag+'</div>':'')+'<div class="rm">金額 '+money(amt)+'</div></div></div>';
+  }).join('');
+  const pl=pettyClaimList(ym),ptotal=pl.reduce((s,x)=>s+(parseFloat(x.amount)||0),0);
+  html+='<div class="card" style="margin-top:16px"><h2 style="margin:0 0 8px">📋 零用金月請款清單</h2><div class="mut" style="margin-bottom:6px">只列出已勾選「本人代墊」的項目</div>'+
+    '<label class="f" style="margin-top:0">選擇月份</label><input class="in" type="month" id="pettyMonth" value="'+ym+'" onchange="matPettyMonthChange(this.value)">'+
+    (pl.length?'<div style="margin-top:10px">'+pl.map(x=>'<div class="dlist"><span class="ic2">💵</span><div style="flex:1"><b>'+esc(x.pettyType||'')+'　'+esc(x.name||'')+'</b><div class="mut">'+x.date+'</div></div><div style="font-weight:800">'+money(x.amount)+'</div></div>').join('')+'</div><div class="qtotal">合計：'+money(ptotal)+'</div>':'<div class="empty">這個月沒有已勾選代墊的零用金紀錄</div>')+
+    '<div class="three"><button class="btn sm" onclick="printPettyClaim()">🖨 列印</button><button class="btn sm" onclick="exportPettyCSV()">⬇ CSV</button><button class="btn sm" onclick="sharePettyClaim()">📤 分享</button></div></div>';
+  return html;
+}
+async function renderVendorRankPage(){
+  $('main').innerHTML=await vendorRankView();
+  $('main').querySelectorAll('[data-vendor]').forEach(el=>{
+    el.addEventListener('click',()=>openVendorDetail(el.dataset.vendor));
+  });
+}
+function openVendorDetail(name){
+  const items=(mdata.materials||[]).filter(x=>x.category!=='零用金'&&((x.vendor||'').trim()||'（未填廠商）')===name)
+    .slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.createdAt-a.createdAt);
+  const total=items.reduce((s,x)=>s+materialAmount(x),0);
+  const vi=(mdata.vendors||[]).find(v=>v.name===name);
+  let html='<div class="sheet-h"><b>'+esc(name)+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    (vi&&(vi.contact||vi.phone)?'<div class="mut" style="margin:-2px 0 8px;font-size:13px">'+esc(vi.contact||'')+(vi.phone?'　📞'+esc(vi.phone):'')+'</div>':'')+
+    '<div class="card" style="margin-top:0"><div class="stat red" style="width:100%"><b>'+money(total)+'</b><span>共 '+items.length+' 筆承攬／發包項目組成</span></div></div>';
+  if(!items.length){
+    html+='<div class="empty"><p>尚無紀錄</p></div>';
+  }else{
+    html+=items.map(it=>{
+      const amt=materialAmount(it);
+      const pct=total>0?(amt/total*100):0;
+      return '<div class="rec" onclick="closeModal();openMaterialForm(\''+it.id+'\')"><div style="width:44px;height:44px;border-radius:10px;background:rgba(127,127,127,.15);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none">'+matCatIcon(it.category)+'</div><div class="rb" style="width:100%">'+
+        '<div class="rt" style="display:flex;justify-content:space-between;gap:8px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(it.name||'')+'</span><span style="flex:none">'+money(amt)+'</span></div>'+
+        '<div class="rm">'+esc(it.category||'')+'　'+it.date+'</div>'+
+        '<div class="rm">佔此廠商 '+pct.toFixed(1)+'%</div>'+
+        '</div></div>';
+    }).join('');
+  }
+  modal(html);
+}
+async function vendorRankView(){
+  await loadMod('materials');await loadMod('vendors');
+  const list=(mdata.materials||[]).filter(x=>x.category!=='零用金');
+  const byVendor={};
+  list.forEach(it=>{
+    const name=(it.vendor||'').trim()||'（未填廠商）';
+    byVendor[name]=(byVendor[name]||0)+materialAmount(it);
+  });
+  const rows=Object.keys(byVendor).map(name=>({name,amt:byVendor[name]})).sort((a,b)=>b.amt-a.amt);
+  const total=rows.reduce((s,r)=>s+r.amt,0);
+  const vendorInfo=n=>(mdata.vendors||[]).find(v=>v.name===n);
+  let html='<button class="btn sm" style="margin-bottom:10px" onclick="openMod(\'materials\')">← 返回材料／發包／零用金</button>'+
+    modProjectSwitcherHTML()+
+    '<div class="card"><h2 style="margin:0 0 4px;font-size:18px">🏆 廠商金額排行</h2><div class="mut" style="font-size:13px">依「發包工程／發包設備／發包材料／其他」金額由高到低排序（不含零用金）</div>'+
+    '<div class="stats" style="margin-top:10px"><div class="stat red"><b>'+money(total)+'</b><span>發包／材料總支出</span></div><div class="stat"><b>'+rows.length+'</b><span>廠商數</span></div></div></div>';
+  if(!rows.length){
+    html+='<div class="empty"><div class="big">🏆</div><p>尚無發包／材料紀錄可統計</p></div>';
+  }else{
+    html+=rows.map((r,i)=>{
+      const pct=total>0?(r.amt/total*100):0;
+      const vi=vendorInfo(r.name);
+      const rankIc=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+      return '<div class="rec" data-vendor="'+esc(r.name)+'" style="align-items:center;cursor:pointer">'+
+        '<div style="width:48px;height:48px;border-radius:10px;background:rgba(127,127,127,.15);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex:none">'+rankIc+'</div>'+
+        '<div class="rb" style="width:100%">'+
+        '<div class="rt" style="display:flex;justify-content:space-between;gap:8px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.name)+'</span><span style="flex:none">'+money(r.amt)+'</span></div>'+
+        (vi&&(vi.contact||vi.phone)?'<div class="rm">'+esc(vi.contact||'')+(vi.phone?'　📞'+esc(vi.phone):'')+'</div>':'')+
+        '<div style="background:rgba(127,127,127,.18);border-radius:99px;height:8px;margin-top:6px;overflow:hidden"><div style="width:'+pct.toFixed(1)+'%;height:100%;background:var(--y);border-radius:99px"></div></div>'+
+        '<div class="rm" style="margin-top:2px">佔比 '+pct.toFixed(1)+'%</div>'+
+        '</div></div>';
+    }).join('');
+  }
+  return html;
+}
+function pettyClaimHTML(ym){
+  const list=pettyClaimList(ym),total=Math.round(list.reduce((s,x)=>s+(parseFloat(x.amount)||0),0)),p=curProject();
+  return '<div class="pg-doc"><h1>'+esc(p.name)+'</h1>'+
+    '<div style="text-align:center;font-size:14px;letter-spacing:2px;margin-top:-4px;margin-bottom:6px">零用金請款清單（'+ym+'）</div>'+
+    '<table><tr><th>日期</th><th>品項</th><th>描述</th><th style="text-align:right">金額</th></tr>'+
+    list.map((x,i)=>'<tr><td>'+x.date+'</td><td>'+esc(x.pettyType||'')+'</td><td>'+esc(x.name||'')+'</td><td style="text-align:right">'+Math.round(x.amount||0).toLocaleString()+'</td></tr>').join('')+'</table>'+
+    '<table style="margin-top:10px"><tr><th>總額（阿拉伯數字）</th><td>NT$ '+total.toLocaleString()+'</td></tr>'+
+    '<tr><th>總額（羅馬數字）</th><td>'+toRoman(total)+'</td></tr>'+
+    '<tr><th>總額（國字大寫）</th><td>新台幣 '+toChineseCapital(total)+'</td></tr></table>'+
+    '<div style="display:flex;justify-content:space-between;margin-top:36px;font-size:14px">'+
+    '<div>申請人簽名：＿＿＿＿＿＿＿＿＿＿</div><div>主管核准簽名：＿＿＿＿＿＿＿＿＿＿</div></div>'+
+    '<div style="text-align:right;font-size:12px;color:#444;margin-top:6px">日期：＿＿＿＿＿＿年＿＿月＿＿日</div>'+
+    '</div>';
+}
+function printPettyClaim(){
+  const ym=curPettyMonth();
+  if(!pettyClaimList(ym).length){toast('該月沒有零用金紀錄');return;}
+  $('printRoot').innerHTML=pettyClaimHTML(ym);window.print();
+}
+function exportPettyCSV(){
+  const ym=curPettyMonth(),list=pettyClaimList(ym);
+  if(!list.length){toast('該月沒有零用金紀錄');return;}
+  const blob=toCSV(list,[{key:'date',label:'日期'},{key:'pettyType',label:'類型'},{key:'name',label:'說明'},{key:'amount',label:'金額'},{key:'note',label:'備註'}]);
+  saveBlob(blob,'零用金請款清單_'+ym+'.csv');
+}
+async function sharePettyClaim(){
+  const ym=curPettyMonth(),list=pettyClaimList(ym),p=curProject();
+  if(!list.length){toast('該月沒有零用金紀錄');return;}
+  const total=list.reduce((s,x)=>s+(parseFloat(x.amount)||0),0);
+  const txt=p.name+' 零用金請款清單（'+ym+'）\n'+list.map((x,i)=>(i+1)+'. '+x.date+' '+x.pettyType+' '+x.name+' NT$'+Math.round(x.amount||0)).join('\n')+'\n\n合計：NT$ '+Math.round(total).toLocaleString();
+  shareText('零用金請款清單',txt);
+}
+
+/* ========== 工地巡檢表 ========== */
+let ckItems=[];
+function openInspectionForm(id){
+  const p=curProject();if(!p){toast('請先新增案場');go('more');return;}
+  const it=id?(mdata.inspections||[]).find(x=>x.id===id):null;
+  ckItems=it?JSON.parse(JSON.stringify(it.items||[])):[{text:'',pass:'合格',note:''}];
+  genCtx={key:'inspections',id:id||''};
+  modal('<div class="sheet-h"><b>'+(it?'編輯':'新增')+'工地巡檢表</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<label class="f" style="margin-top:0">巡檢主題 *</label><input class="in" id="ckTitle" value="'+esc(it?it.title:'定期工地安全巡檢')+'">'+
+    '<div class="two"><div><label class="f">日期</label><input class="in" type="date" id="ckDate" value="'+(it?it.date:todayStr())+'"></div><div><label class="f">巡檢人</label><input class="in" id="ckBy" value="'+esc(it?it.inspector:'')+'"></div></div>'+
+    '<label class="f">檢查項目</label><div id="ckBox"></div><button class="btn sm" onclick="ckAdd()">＋ 新增項目</button>'+
+    '<label class="f">備註</label><textarea class="in" id="ckNote">'+esc(it?it.note:'')+'</textarea><div class="gap"></div>'+
+    '<button class="btn dark" onclick="saveInspection()">💾 儲存</button>'+
+    (it?'<div class="two" style="margin-top:10px"><button class="btn" onclick="printInspection(\''+id+'\')">🖨 列印</button><button class="btn red" onclick="delInspection()">🗑 刪除</button></div>':''));
+  renderCk();
+}
+function renderCk(){
+  const box=$('ckBox');if(!box)return;
+  box.innerHTML=ckItems.map((it,i)=>'<div class="ckrow"><input type="text" placeholder="檢查項目" value="'+esc(it.text)+'" oninput="ckItems['+i+'].text=this.value"><select onchange="ckItems['+i+'].pass=this.value"><option '+(it.pass==='合格'?'selected':'')+'>合格</option><option '+(it.pass==='不合格'?'selected':'')+'>不合格</option><option '+(it.pass==='N/A'?'selected':'')+'>N/A</option></select><button class="rmbtn" onclick="ckItems.splice('+i+',1);renderCk()">✕</button></div>').join('');
+}
+function ckAdd(){ckItems.push({text:'',pass:'合格',note:''});renderCk();}
+async function saveInspection(){
+  const title=$('ckTitle').value.trim();
+  if(!title){toast('請輸入巡檢主題');return;}
+  const p=curProject();
+  let rec=genCtx.id?(mdata.inspections||[]).find(x=>x.id===genCtx.id):{id:uid(),projectId:p.id,createdAt:Date.now()};
+  Object.assign(rec,{title:title,date:$('ckDate').value,inspector:$('ckBy').value.trim(),items:ckItems.filter(it=>it.text),note:$('ckNote').value.trim()});
+  await dbPut('inspections',rec);closeModal();await loadMod('inspections');
+  if(state.view==='mod'&&state.mod==='inspections')renderModView();
+  toast('已儲存');
+}
+async function delInspection(){
+  if(!(await askConfirm('確定刪除？')))return;
+  await dbDel('inspections',genCtx.id);closeModal();await loadMod('inspections');
+  if(state.view==='mod')renderModView();toast('已刪除');
+}
+async function inspectionListView(){
+  await loadMod('inspections');
+  const list=(mdata.inspections||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  let html='<button class="btn sm" style="margin-bottom:10px" onclick="go(\'more\')">← 返回更多</button><div class="card" style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">✅ 工地巡檢表</h2><span class="mut">共 '+list.length+' 筆</span></div>'+
+    '<button class="btn y" style="margin-bottom:10px" onclick="openInspectionForm()">＋ 新增巡檢表</button>';
+  if(!list.length)html+='<div class="empty"><div class="big">✅</div><p>尚無資料</p></div>';
+  html+=list.map(it=>{const fail=(it.items||[]).filter(x=>x.pass==='不合格').length;
+    return '<div class="rec" onclick="openInspectionForm(\''+it.id+'\')"><div style="width:48px;height:48px;border-radius:10px;background:rgba(127,127,127,.15);display:flex;align-items:center;justify-content:center;font-size:22px;flex:none">✅</div><div class="rb"><div class="rt">'+esc(it.title)+'</div><div class="rm">'+it.date+'　巡檢人：'+esc(it.inspector||'—')+'</div>'+(fail?'<span class="badge" style="background:#dc2626">'+fail+' 項不合格</span>':'<span class="badge" style="background:#16a34a">全數合格</span>')+'</div></div>';
+  }).join('');
+  return html;
+}
+function printInspection(id){
+  const it=(mdata.inspections||[]).find(x=>x.id===id),p=curProject();if(!it)return;
+  const rows=(it.items||[]).map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(r.text)+'</td><td>'+esc(r.pass)+'</td></tr>').join('');
+  $('printRoot').innerHTML='<div class="pg-doc"><h1>工地巡檢表</h1><table><tr><th>工程名稱</th><td>'+esc(p.name)+'</td><th>日期</th><td>'+it.date+'</td></tr><tr><th>巡檢主題</th><td>'+esc(it.title)+'</td><th>巡檢人</th><td>'+esc(it.inspector||'—')+'</td></tr></table>'+
+    '<table><tr><th>#</th><th>檢查項目</th><th>結果</th></tr>'+rows+'</table>'+(it.note?'<p>備註：'+esc(it.note)+'</p>':'')+'</div>';
+  window.print();
+}
+
+/* ========== 圖紙標記 ========== */
+let bpPending=null,bpEditing=null;
+function openBlueprintForm(id){
+  const p=curProject();if(!p){toast('請先新增案場');go('more');return;}
+  bpEditing=id||null;bpPending=null;
+  const it=id?(mdata.blueprints||[]).find(x=>x.id===id):null;
+  modal('<div class="sheet-h"><b>'+(it?'圖紙標記':'新增圖紙')+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    (it?'<label class="f" style="margin-top:0">圖紙名稱</label><input class="in" id="bpName" value="'+esc(it.name)+'" onchange="renameBlueprint(\''+it.id+'\',this.value)">'+
+      '<div class="bpwrap" id="bpWrap"><img id="bpImg" src=""></div><div class="mut" style="font-size:12px;margin:6px 0">點圖片任意位置新增標記點</div><div class="pinlist" id="pinList"></div>'+
+      '<div class="two" style="margin-top:10px"><button class="btn" onclick="exportBlueprint(\''+it.id+'\')">💾 匯出標記圖</button><button class="btn red" onclick="delBlueprint(\''+it.id+'\')">🗑 刪除圖紙</button></div>'
+      :'<label class="f" style="margin-top:0">圖紙名稱</label><input class="in" id="bpName" placeholder="例如：3F 機電施工圖" value="施工圖紙">'+
+       '<div class="mut" style="font-size:12px;margin:6px 0">支援圖片格式圖紙（大尺寸圖面建議先拍照或截圖後匯入）</div>'+
+       '<div class="two"><label class="btn y">📷 拍照<input type="file" accept="image/*" capture="environment" hidden onchange="bpPick(this)"></label><label class="btn">🖼 選擇圖檔<input type="file" accept="image/*" hidden onchange="bpPick(this)"></label></div>'+
+       '<div class="prevbox" id="bpPreview">尚未選擇圖紙</div><div class="gap"></div><button class="btn dark" onclick="saveBlueprint()">💾 儲存圖紙</button>'));
+  if(it){getFull(it.id,'blueprintPhotos').then(u=>{$('bpImg').src=u;bindBpTap();});renderPins(it);}
+}
+function bpPick(inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  bpPending=f;
+  const u=URL.createObjectURL(f);$('bpPreview').innerHTML='<img src="'+u+'">';
+}
+async function saveBlueprint(){
+  if(!bpPending){toast('請先選擇圖紙圖片');return;}
+  const name=$('bpName').value.trim()||'施工圖紙';
+  busy(true,'處理圖紙中…');
+  try{
+    const bmp=await loadBitmap(bpPending);
+    const MAXW=1600,sc=Math.min(1,MAXW/bmp.width),w=Math.round(bmp.width*sc),h=Math.round(bmp.height*sc);
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(bmp,0,0,w,h);
+    if(bmp.close)bmp.close();
+    const blob=await cvBlob(c,0.85);
+    const p=curProject();
+    const rec={id:uid(),projectId:p.id,name:name,pins:[],createdAt:Date.now()};
+    const t=db.transaction(['blueprints','blueprintPhotos'],'readwrite');
+    t.objectStore('blueprints').put(rec);t.objectStore('blueprintPhotos').put({id:rec.id,blob:blob});
+    await txDone(t);
+    closeModal();await loadMod('blueprints');
+    if(state.view==='mod'&&state.mod==='blueprints')renderModView();
+    toast('已儲存圖紙');
+  }catch(e){alert('處理失敗：'+(e&&e.message||e));}
+  finally{busy(false);}
+}
+async function renameBlueprint(id,name){
+  const it=(mdata.blueprints||[]).find(x=>x.id===id);if(!it)return;
+  it.name=name.trim()||it.name;await dbPut('blueprints',it);await loadMod('blueprints');
+}
+function bindBpTap(){
+  const img=$('bpImg');if(!img)return;
+  img.onclick=(e)=>{
+    const r=img.getBoundingClientRect();
+    const xp=((e.clientX-r.left)/r.width*100).toFixed(1),yp=((e.clientY-r.top)/r.height*100).toFixed(1);
+    const t=prompt('這個位置的標記文字：');
+    if(t&&t.trim())addPin(bpEditing,+xp,+yp,t.trim());
+  };
+}
+async function addPin(id,x,y,text){
+  const it=(mdata.blueprints||[]).find(b=>b.id===id);if(!it)return;
+  it.pins=it.pins||[];it.pins.push({x:x,y:y,text:text});
+  await dbPut('blueprints',it);renderPins(it);
+}
+function renderPins(it){
+  const wrap=$('bpWrap');if(!wrap)return;
+  [...wrap.querySelectorAll('.pin')].forEach(p=>p.remove());
+  (it.pins||[]).forEach((pin,i)=>{
+    const d=document.createElement('div');d.className='pin';d.style.left=pin.x+'%';d.style.top=pin.y+'%';d.innerHTML='<span>'+(i+1)+'</span>';d.title=pin.text;
+    wrap.appendChild(d);
+  });
+  const list=$('pinList');if(list)list.innerHTML=(it.pins||[]).map((pin,i)=>'<div class="pinrow"><b>'+(i+1)+'</b><div style="flex:1">'+esc(pin.text)+'</div><button class="rmbtn" onclick="rmPin(\''+it.id+'\','+i+')">✕</button></div>').join('');
+}
+async function rmPin(id,idx){
+  const it=(mdata.blueprints||[]).find(b=>b.id===id);if(!it)return;
+  it.pins.splice(idx,1);await dbPut('blueprints',it);renderPins(it);
+}
+async function delBlueprint(id){
+  if(!(await askConfirm('確定刪除此圖紙？')))return;
+  await dbDel('blueprints',id);await dbDel('blueprintPhotos',id);
+  const key='blueprintPhotos:'+id;if(urlCache[key]){URL.revokeObjectURL(urlCache[key]);delete urlCache[key];}
+  closeModal();await loadMod('blueprints');
+  if(state.view==='mod')renderModView();toast('已刪除');
+}
+async function exportBlueprint(id){
+  const it=(mdata.blueprints||[]).find(b=>b.id===id);if(!it)return;
+  busy(true,'匯出中…');
+  try{
+    const u=await getFull(id,'blueprintPhotos'),img=new Image();img.src=u;await img.decode();
+    const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const x=c.getContext('2d');
+    x.drawImage(img,0,0);
+    (it.pins||[]).forEach((pin,i)=>{
+      const px=img.width*pin.x/100,py=img.height*pin.y/100,r=Math.max(14,img.width/60);
+      x.fillStyle='#dc2626';x.beginPath();x.arc(px,py,r,0,Math.PI*2);x.fill();
+      x.fillStyle='#fff';x.font='bold '+Math.round(r*1.1)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(String(i+1),px,py);
+      x.font='bold '+Math.round(r)+'px -apple-system,"PingFang TC",sans-serif';x.textAlign='left';
+      const tw=x.measureText(pin.text).width+16;
+      x.fillStyle='rgba(0,0,0,.75)';x.fillRect(px+r,py-r,tw,r*2);
+      x.fillStyle='#fff';x.textBaseline='middle';x.fillText(pin.text,px+r+8,py);
+    });
+    await saveBlob(await cvBlob(c,0.9),'blueprint_'+fmtD(Date.now())+'.jpg');
+  }catch(e){alert('匯出失敗：'+(e&&e.message||e));}
+  finally{busy(false);}
+}
+async function blueprintListView(){
+  await loadMod('blueprints');
+  const list=(mdata.blueprints||[]).slice().sort((a,b)=>b.createdAt-a.createdAt);
+  let html='<button class="btn sm" style="margin-bottom:10px" onclick="go(\'more\')">← 返回更多</button><div class="card" style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:18px">📐 圖紙標記</h2><span class="mut">共 '+list.length+' 張</span></div>'+
+    '<button class="btn y" style="margin-bottom:10px" onclick="openBlueprintForm()">＋ 新增圖紙</button>';
+  if(!list.length)html+='<div class="empty"><div class="big">📐</div><p>尚無圖紙</p></div>';
+  html+=list.map(it=>'<div class="rec" onclick="openBlueprintForm(\''+it.id+'\')"><img data-pid="'+it.id+'" data-store="blueprintPhotos" src="" alt=""><div class="rb"><div class="rt">'+esc(it.name)+'</div><div class="rm">標記點：'+(it.pins?it.pins.length:0)+' 個</div></div></div>').join('');
+  return html;
+}
+
+/* ========== 更多選單 ========== */
+function viewMore(){
+  const dark=document.documentElement.dataset.theme==='dark';
+  return '<div class="card"><h2 style="margin:0 0 6px">☰ 更多功能</h2><div class="switchrow"><span>🌗 深色模式</span><button class="sw '+(dark?'on':'')+'" onclick="toggleTheme();render()"><i></i></button></div></div>'+
+    '<div class="mgrid">'+
+    mitem('projects','🏗','案場管理')+
+    mitem('mod:workers','👷','施工人員')+
+    mitem('orgchart','🌳','組織架構圖')+
+    mitem('mod:materials','📦','材料/發包/零用金')+
+    mitem('mod:inspections','✅','工地巡檢表')+
+    mitem('mod:meetings','🗒','會議記錄')+
+    mitem('mod:blueprints','📐','圖紙標記')+
+    mitem('compare','🔀','照片對比')+
+    mitem('report','🖨','報表匯出')+
+    '</div>';
+}
+function mitem(target,ic,lb){
+  const act=target.startsWith('mod:')?'openMod(\''+target.slice(4)+'\')':'go(\''+target+'\')';
+  return '<button class="mitem" onclick="'+act+'"><span class="ic">'+ic+'</span><span class="lb">'+lb+'</span></button>';
+}
+async function renderModView(){
+  const key=state.mod,m=$('main');
+  let html='';
+  if(key==='materials')html=await materialListView();
+  else if(key==='inspections')html=await inspectionListView();
+  else if(key==='blueprints'){html=await blueprintListView();}
+  else if(MODULES[key])html=await genericListView(key);
+  else html='<div class="empty">找不到此功能</div>';
+  if(state.view==='mod'&&state.mod===key){m.innerHTML=html;hydrate();}
+}
+
+/* ========== 報表（相片紀錄表 + CSV） ========== */
+function viewReport(){
+  return '<button class="btn sm" style="margin-bottom:10px" onclick="go(\'more\')">← 返回更多</button>'+
+    '<div class="card"><h2 style="margin:0 0 10px">⬇ 快速匯出</h2><div class="two"><button class="btn" onclick="exportCSV(\'records\')">施工日誌 CSV</button><button class="btn" onclick="exportCSV(\'materials\')">材料訂單 CSV</button></div><div class="mut" style="margin-top:6px;font-size:12px">CSV 可直接用 Excel／Numbers 開啟</div></div>'+
+    '<div class="card"><label class="f" style="margin-top:0">相片紀錄表標題</label><input class="in" value="'+esc(rep.title)+'" oninput="rep.title=this.value;buildReport()">'+
+    '<label class="f">填表人／監工</label><input class="in" placeholder="姓名（選填）" value="'+esc(rep.by)+'" oninput="rep.by=this.value;lsSet(\'by\',this.value);buildReport()">'+
+    '<div class="two"><div><label class="f">範圍</label><select class="in" onchange="rep.scope=this.value;buildReport()"><option value="filtered" '+(rep.scope==='filtered'?'selected':'')+'>目前篩選</option><option value="all" '+(rep.scope==='all'?'selected':'')+'>全部紀錄</option></select></div>'+
+    '<div><label class="f">每頁張數</label><select class="in" onchange="rep.per=+this.value;buildReport()"><option value="4" '+(rep.per===4?'selected':'')+'>4 張 (2×2)</option><option value="6" '+(rep.per===6?'selected':'')+'>6 張 (2×3)</option></select></div></div>'+
+    '<div class="mut" id="repCount" style="margin-top:8px"></div></div>'+
+    '<div class="two"><button class="btn y" onclick="printReport()">🖨 列印／存成 PDF</button><button class="btn" onclick="shareSummary()">📤 分享文字摘要</button></div>'+
+    '<div class="mut" style="margin:8px 2px 12px;font-size:12px">iPhone 儲存 PDF：按列印 → 在預覽縮圖上兩指放大 → 點分享 → 儲存到檔案。</div>'+
+    '<div id="repPrev"></div>';
+}
+function reportList(){
+  return (rep.scope==='all'?recs.slice():filtered()).sort((a,b)=>a.createdAt-b.createdAt);
+}
+function reportHTML(list){
+  const p=curProject(),per=rep.per,rows=per/2;
+  if(!list.length)return '<div class="empty">沒有可匯出的紀錄</div>';
+  const pages=[];for(let i=0;i<list.length;i+=per)pages.push(list.slice(i,i+per));
+  const dr=fmtD(list[0].createdAt)+(fmtD(list[list.length-1].createdAt)!==fmtD(list[0].createdAt)?' ～ '+fmtD(list[list.length-1].createdAt):'');
+  return pages.map((pg,pi)=>{
+    const cells=pg.map((r,k)=>{
+      const no=pi*per+k+1;
+      return '<div class="cell"><div class="ph"><img data-pid="'+r.id+'" alt=""></div><table class="ct">'+
+        '<tr><th>編號</th><td>'+String(no).padStart(3,'0')+'</td><th>狀態</th><td><span class="st" style="background:'+ST[r.status].c+'">'+ST[r.status].n+'</span></td></tr>'+
+        '<tr><th>項目</th><td colspan="3">'+esc(r.title)+'</td></tr>'+
+        '<tr><th>位置</th><td colspan="3">'+esc(r.location||'—')+'</td></tr>'+
+        '<tr><th>日期</th><td colspan="3">'+fmt(r.createdAt)+'</td></tr>'+
+        '<tr><th>說明</th><td colspan="3"><div class="clamp">'+(esc(r.desc)||'—')+'</div></td></tr></table></div>';
+    }).join('');
+    return '<section class="pg"><h1 class="pg-t">'+esc(rep.title||'工程相片紀錄表')+'</h1>'+
+      '<table class="pg-i"><tr><th>工程名稱</th><td>'+esc(p.name)+'</td><th>業主／主包</th><td>'+esc(p.client||'—')+'</td></tr>'+
+      '<tr><th>施作位置</th><td>'+esc(p.location||'—')+'</td><th>紀錄期間</th><td>'+dr+'</td></tr>'+
+      '<tr><th>填表人</th><td>'+esc(rep.by||'')+'</td><th>製表日期</th><td>'+fmtD(Date.now())+'</td></tr></table>'+
+      '<div class="pg-g" style="grid-template-rows:repeat('+rows+',1fr)">'+cells+'</div>'+
+      '<div class="pg-f">第 '+(pi+1)+' / '+pages.length+' 頁　共 '+list.length+' 張</div></section>';
+  }).join('');
+}
+function buildReport(){
+  const list=reportList(),html=reportHTML(list);
+  const pv=$('repPrev');if(!pv)return;
+  pv.innerHTML=html;$('printRoot').innerHTML=html;
+  $('repCount').textContent='將輸出 '+list.length+' 筆紀錄，共 '+Math.ceil(list.length/rep.per)+' 頁 A4';
+  fitReport();hydrate();
+}
+function fitReport(){
+  const pv=$('repPrev'),m=$('main');if(!pv||!m)return;
+  pv.style.zoom=Math.min(1,(m.clientWidth-24)/794);
+}
+window.addEventListener('resize',fitReport);
+async function printReport(){
+  if(!reportList().length){toast('沒有可匯出的紀錄');return;}
+  busy(true,'準備報表…');
+  try{await hydrate();}finally{busy(false);}
+  window.print();
+}
+async function shareSummary(){
+  const p=curProject(),l=reportList();
+  const cnt=k=>l.filter(r=>r.status===k).length;
+  const t=(rep.title||'工程相片紀錄表')+'\n工程：'+p.name+'\n業主／主包：'+(p.client||'—')+'\n位置：'+(p.location||'—')+'\n共 '+l.length+' 筆（'+STK.map(k=>ST[k].n+cnt(k)).join('／')+'）\n\n'+
+    l.map((r,i)=>(i+1)+'. ['+ST[r.status].n+'] '+r.title+'｜'+(r.location||'—')+'｜'+fmt(r.createdAt)).join('\n');
+  shareText(rep.title,t);
+}
+
+/* ========== 案場管理 ========== */
+function viewProjects(){
+  const list=projects.slice().reverse().map(p=>
+    '<div class="rec" style="align-items:center;'+(p.id===curId?'box-shadow:0 0 0 2px var(--y)':'')+'" onclick="switchProject(\''+p.id+'\').then(()=>go(\'records\'))">'+
+    '<div class="rb"><div class="rt">'+esc(p.name)+'</div></div>'+
+    '<span class="pill" style="background:'+(p.status==='done'?'#6b7280':'#16a34a')+';flex:none;margin-right:8px">'+(p.status==='done'?'已完工':'進行中')+'</span>'+
+    '<button class="btn sm" style="width:auto;min-height:38px;flex:none" onclick="event.stopPropagation();openProjectForm(\''+p.id+'\')">✏️</button></div>'
+  ).join('');
+  return '<button class="btn sm" style="margin-bottom:10px" onclick="go(\'more\')">← 返回更多</button><button class="btn y" onclick="openProjectForm()">＋ 新增案場</button><div class="gap"></div><div class="mut" style="margin-bottom:6px">點案場名稱可切換並查看該案場首頁與財務總覽</div>'+(list||'<div class="empty"><div class="big">🏗</div><p>尚無案場</p></div>')+
+    '<div class="card"><b>資料備份</b><div class="mut" style="margin:6px 0 10px">資料只存在這支手機的瀏覽器中，清除網站資料或換手機前請先匯出備份。</div><div class="two"><button class="btn" onclick="exportBackup()">⬇ 匯出備份</button><label class="btn">⬆ 匯入備份<input type="file" hidden accept=".json,application/json" onchange="importBackup(this)"></label></div></div>';
+}
+let pStatus='active',pDed=[];
+function openProjectForm(id){
+  const p=id?projects.find(x=>x.id===id):null;pStatus=p?p.status:'active';
+  pDed=p&&p.deductions&&p.deductions.length?JSON.parse(JSON.stringify(p.deductions)):JSON.parse(JSON.stringify(DEFAULT_DEDUCTIONS));
+  modal('<div class="sheet-h"><b>'+(p?'編輯案場':'新增案場')+'</b><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<label class="f">工程名稱 *</label><input class="in" id="pName" value="'+esc(p?p.name:'')+'" placeholder="例如：○○大樓機電工程">'+
+    '<label class="f">業主／主包商</label><input class="in" id="pClient" value="'+esc(p?p.client:'')+'">'+
+    '<label class="f">施作地址</label><input class="in" id="pLoc" value="'+esc(p?p.location:'')+'" placeholder="例如：台北市○○區○○路123號">'+
+    '<label class="f">開工日期</label><input class="in" type="date" id="pStart" value="'+esc(p&&p.startDate?p.startDate:(p?fmtD(p.createdAt):todayStr()))+'">'+
+    '<label class="f">合約完工日期</label><input class="in" type="date" id="pContractEnd" value="'+esc(p&&p.contractEndDate?p.contractEndDate:'')+'" placeholder="留空則不顯示剩餘天數">'+
+    '<label class="f">專案狀態</label><div class="two" id="pSt"></div>'+
+    '<label class="f">承攬金額(未稅)</label><input class="in" type="number" id="pContract" value="'+(p&&p.finalContract?p.finalContract:'')+'" placeholder="例如：3000000" oninput="pFinRecalc()">'+
+    '<label class="f">承攬金額扣除項目（依百分比計算）</label><div id="pDedBox"></div>'+
+    '<button class="btn sm" onclick="pAddDed()">＋ 新增扣除項目</button><div class="gap"></div>'+
+    '<div class="stat"><b id="pNet">'+money(0)+'</b><span>淨承攬金額（預覽）</span></div><div class="gap"></div><div class="gap"></div>'+
+    '<button class="btn dark" onclick="saveProject('+(p?'\''+p.id+'\'':'null')+')">💾 儲存案場</button>'+
+    (p?'<div class="gap"></div><button class="btn red" onclick="delProject(\''+p.id+'\')">🗑 刪除此案場</button>':''));
+  renderPSt();renderPDed();
+}
+function renderPSt(){
+  $('pSt').innerHTML=[['active','進行中','#16a34a'],['done','已完工','#6b7280']].map(a=>'<button class="chip '+(pStatus===a[0]?'on':'')+'" style="height:52px;'+(pStatus===a[0]?'background:'+a[2]+';border-color:'+a[2]:'')+'" onclick="pStatus=\''+a[0]+'\';renderPSt()">'+a[1]+'</button>').join('');
+}
+function pDedRowHTML(d,i){
+  return '<div class="ckrow"><input type="text" placeholder="扣除項目名稱" value="'+esc(d.name)+'" oninput="pDed['+i+'].name=this.value"><input type="number" style="width:64px" value="'+d.pct+'" oninput="pDed['+i+'].pct=+this.value;pFinRecalc()">%<span class="mut pdedamt" data-i="'+i+'" style="width:100px;text-align:right;flex:none">NT$ 0</span><button class="rmbtn" onclick="pDed.splice('+i+',1);renderPDed()">✕</button></div>';
+}
+function renderPDed(){const box=$('pDedBox');if(!box)return;box.innerHTML=pDed.map(pDedRowHTML).join('');pFinRecalc();}
+function pAddDed(){pDed.push({name:'',pct:0});renderPDed();}
+function pFinRecalc(){
+  const el=$('pContract');if(!el)return;
+  const contract=parseFloat(el.value)||0;
+  let dedSum=0;
+  pDed.forEach((d,i)=>{
+    const amt=contract*(parseFloat(d.pct)||0)/100;dedSum+=amt;
+    const sp=document.querySelector('.pdedamt[data-i="'+i+'"]');if(sp)sp.textContent=money(amt);
+  });
+  if($('pNet'))$('pNet').textContent=money(contract-dedSum);
+}
+async function saveProject(id){
+  const name=$('pName').value.trim();
+  if(!name){toast('請輸入工程名稱');return;}
+  const p=id?projects.find(x=>x.id===id):{id:uid(),createdAt:Date.now()};
+  const wasDone=p.status==='done';
+  Object.assign(p,{name:name,client:$('pClient').value.trim(),location:$('pLoc').value.trim(),status:pStatus,
+    startDate:($('pStart')&&$('pStart').value)||'',
+    contractEndDate:($('pContractEnd')&&$('pContractEnd').value)||'',
+    finalContract:parseFloat($('pContract').value)||0,deductions:pDed.filter(d=>d.name)});
+  if(pStatus==='done'&&!wasDone&&!p.completedAt)p.completedAt=Date.now();
+  if(pStatus!=='done')p.completedAt='';
+  await dbPut('projects',p);
+  if(!id){curId=p.id;lsSet('cur',curId);}
+  closeModal();await loadProjects();await loadRecs();
+  if(!id)state.view='records';
+  render();toast('已儲存案場');
+}
+async function delProject(id){
+  const n=counts[id]||0;
+  if(!(await askConfirm('確定刪除此案場？其中 '+n+' 筆紀錄與照片將一併刪除，無法復原。')))return;
+  const ids=await req(store('records').index('projectId').getAllKeys(id));
+  await delRecordDB(ids);
+  ids.forEach(i=>{const key='photos:'+i;if(urlCache[key]){URL.revokeObjectURL(urlCache[key]);delete urlCache[key];}});
+  for(const sName of EXTRA_STORES){
+    if(sName==='blueprintPhotos')continue;
+    const rows=await req(store(sName).index('projectId').getAllKeys(id));
+    const t=db.transaction(sName,'readwrite');rows.forEach(rid=>t.objectStore(sName).delete(rid));await txDone(t);
+    if(sName==='blueprints'){const t2=db.transaction('blueprintPhotos','readwrite');rows.forEach(rid=>t2.objectStore('blueprintPhotos').delete(rid));await txDone(t2);}
+  }
+  const t=db.transaction('projects','readwrite');t.objectStore('projects').delete(id);await txDone(t);
+  closeModal();await loadProjects();await loadRecs();render();toast('已刪除案場');
+}
+
+/* ========== 備份匯出／匯入 ========== */
+const b2d=b=>new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=rej;f.readAsDataURL(b);});
+async function exportBackup(){
+  busy(true,'打包備份中…');
+  try{
+    const ps=await dbAll('projects'),rs=await dbAll('records'),phs=await dbAll('photos');
+    const photos=[];for(const p of phs)photos.push({id:p.id,data:await b2d(p.blob)});
+    const extra={};
+    for(const s of EXTRA_STORES){
+      if(s==='blueprintPhotos'){
+        const arr=await dbAll(s);extra[s]=[];for(const p of arr)extra[s].push({id:p.id,data:await b2d(p.blob)});
+      }else extra[s]=await dbAll(s);
+    }
+    const blob=new Blob([JSON.stringify({v:2,at:Date.now(),projects:ps,records:rs,photos:photos,extra:extra})],{type:'application/json'});
+    await saveBlob(blob,'sitelog_backup_'+fmtD(Date.now()).replace(/-/g,'')+'.json');
+  }catch(e){alert('匯出失敗：'+(e&&e.message||e));}
+  finally{busy(false);}
+}
+async function importBackup(inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  if(!(await askConfirm('匯入會合併備份內容（相同編號將覆蓋）。繼續？','繼續匯入'))){inp.value='';return;}
+  busy(true,'匯入中…');
+  try{
+    const d=JSON.parse(await f.text());
+    for(const p of d.projects||[])await dbPut('projects',p);
+    for(const r of d.records||[])await dbPut('records',r);
+    for(const ph of d.photos||[])await dbPut('photos',{id:ph.id,blob:await (await fetch(ph.data)).blob()});
+    if(d.extra){
+      for(const s of EXTRA_STORES){
+        const arr=d.extra[s]||[];
+        if(s==='blueprintPhotos'){for(const p of arr)await dbPut(s,{id:p.id,blob:await (await fetch(p.data)).blob()});}
+        else{for(const r of arr)await dbPut(s,r);}
+      }
+    }
+    await loadProjects();await loadRecs();render();toast('匯入完成');
+  }catch(e){alert('匯入失敗：'+(e&&e.message||e));}
+  finally{busy(false);inp.value='';}
+}
+
+/* ========== 啟動 ========== */
+function setIcon(){
+  const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d');
+  x.fillStyle='#111827';x.fillRect(0,0,180,180);
+  x.fillStyle='#ffc400';x.beginPath();x.arc(90,90,68,0,Math.PI*2);x.fill();
+  x.fillStyle='#111827';x.font='900 96px -apple-system,"PingFang TC",sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('工',90,96);
+  $('touchIcon').href=c.toDataURL('image/png');
+}
+(async function boot(){
+  setIcon();
+  const th=lsGet('theme');
+  if(th==='dark'){document.documentElement.dataset.theme='dark';$('themeBtn').textContent='☀️';}
+  try{db=await openDB();}
+  catch(e){$('main').innerHTML='<div class="empty"><div class="big">⚠️</div><p>此瀏覽器無法使用本機資料庫。<br>請勿使用無痕模式，並確認是用 Safari 開啟。</p></div>';return;}
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  await loadProjects();await loadRecs();
+  if(!projects.length)state.view='more';
+  render();
+  if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
